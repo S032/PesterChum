@@ -1,0 +1,6 @@
+SELECT US1.UserName, US2.UserName
+FROM Chats as CH
+INNER JOIN User AS US1
+ON CH.User1 = US1.ID
+INNER JOIN User AS US2
+ON CH.User2 = US2.ID
