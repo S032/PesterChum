@@ -1,10 +1,9 @@
 #include "auth.h"
 #include "ui_auth.h"
-#include "client.h"
+#include "mainwindow.h"
+//#include "client.h"
 #include <QLineEdit>
 #include <string>
-
-client *cl;
 
 Auth::Auth(QWidget *parent)
     : QDialog(parent)
@@ -32,7 +31,12 @@ void Auth::on_SignUpButton_clicked() // SIGN UP EVENT
     std::string password = ui->passwordLine->text().toStdString();
 
     cl->Connect();
-    cl->reg_user(username, password);
-    cl->Close();
+    if(!cl->reg_user(username, password)) {
+        cl->err("Failed to registratre,\nuser name is taken!");
+        return;
+    }
+    emit sendUser(username, password, cl);
+    this->close();
+
 }
 

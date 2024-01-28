@@ -39,7 +39,8 @@ client::Close() {
 
 bool
 client::reg_user(std::string username, std::string password) {
-    std::string querry = "reg :" + username + ":" + password;
+    std::string querry = "/reg/" + username + "/" + password;
     if (send(clientSock, querry.c_str(), querry.size(), 0) < 0)
-        err("regestration failed");
+        return false;
+    return true;
 }

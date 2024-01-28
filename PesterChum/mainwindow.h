@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "auth.h"
+#include "client.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,5 +21,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    Auth *reg;
+public slots:
+    void startChat(std::string S_user, std::string S_pass, client *cl);
 };
 #endif // MAINWINDOW_H

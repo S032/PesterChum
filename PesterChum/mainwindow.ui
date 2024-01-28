@@ -10,17 +10,46 @@
     <height>600</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <family>Bahnschrift</family>
+    <pointsize>10</pointsize>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>220</y>
+      <width>541</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Bahnschrift</family>
+      <pointsize>44</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Это чат если что</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>18</height>
     </rect>
    </property>
   </widget>
