@@ -47,6 +47,8 @@ server::recieve(int currentsockfd, int index) {
         printf("client is disconected form <%s:%d>\n", ip, port);
     }
 
+    printf("%s\n", buf);
+
     int sockfd;
     for (int k = 0; k <= maxi; k++) {
         sockfd = client[k];

@@ -21,6 +21,8 @@ class ChatDatabase {
 private:
     sql::mysql::MySQL_Driver *driver;
     sql::Connection *conn;
+    sql::Statement *stmt;
+    sql::ResultSet *rs;
     user_t User;
     std::string db_user = "chat_admin";
     std::string db_pass = "5639";
@@ -28,10 +30,11 @@ private:
     std::string db = "PesterChum";
 public:
     ChatDatabase();
-    int reg_user(user_t *user);
-    int log_user(user_t *user);
+    bool reg_user(user_t *user);
+    bool log_user(user_t *user);
 private:
-    bool check_user(user_t user);
+    int find_next_id(sql::SQLString Table);
+    bool check_username(user_t *user);
 };
 
 
