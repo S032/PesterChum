@@ -35,6 +35,7 @@ public:
 private:
     int find_next_id(sql::SQLString Table);
     bool check_username(user_t *user);
+    void print_err(sql::SQLException e);
 };
 
 

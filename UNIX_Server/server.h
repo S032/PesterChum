@@ -1,6 +1,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+#include "DataBase/ChatDatabase.h"
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,12 +28,14 @@
 class server
 {
 private:
-    int i, maxi, maxfd, listenfd, connfd, currentsockfd;
-    int sockcount, client[FD_SETSIZE];
-    ssize_t n;
-    fd_set readset, allset;
-    char buf[MAXLINE];
-    socklen_t clilen;
+    user_t             current_user;
+    ChatDatabase       *DB;
+    int                i, maxi, maxfd, listenfd, connfd, currentsockfd;
+    int                sockcount, client[FD_SETSIZE];
+    ssize_t            n;
+    fd_set             readset, allset;
+    char               buf[MAXLINE];
+    socklen_t          clilen;
     struct sockaddr_in cliaddr, servaddr;
 public:
     server();

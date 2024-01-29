@@ -30,6 +30,8 @@ server::init() {
         exit_err("Bind Failed");
     printf("Success\n");
 
+    DB = new ChatDatabase;
+
     printf("Server initialized\n");
 }
 
