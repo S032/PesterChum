@@ -13,6 +13,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <iostream>
+#include <unordered_map>
 
 /* Conection Constants */
 #define SERV_PORT 34543
@@ -32,6 +33,7 @@ private:
     ChatDatabase       *DB;
     int                i, maxi, maxfd, listenfd, connfd, currentsockfd;
     int                sockcount, client[FD_SETSIZE];
+    std::unordered_map<int, std::string> clients;
     ssize_t            n;
     fd_set             readset, allset;
     char               buf[MAXLINE];
@@ -43,9 +45,10 @@ public:
     void start();
     void stop();
 private:
+    void query_handler(std::string query);
     void exit_err(const char*);
     void init();
-    void recieve(int, int);
+    void recieve(int, std::string);
     void proccess();
     void Send();
 };
