@@ -33,7 +33,7 @@ class server
 private:
     user_t             current_user;
     ChatDatabase       *DB;
-    int                maxfd, listenfd, connfd, currentsockfd, err;
+    int                maxfd, listenfd, connfd;
     int                sockcount, client[FD_SETSIZE];
     std::map<int, std::string> clients;
     std::vector<int> sockToDelete; 
@@ -48,10 +48,10 @@ public:
     void start();
     void stop();
 private:
-    void query_handler(std::string query);
+    bool query_handler(int, std::string, std::string*);
     void exit_err(const char*);
     void init();
-    void recieve(int, std::string);
+    void recieve(int, std::string*);
     void proccess();
     void Send();
 };

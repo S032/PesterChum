@@ -30,39 +30,34 @@ void server::init() {
     printf("Server initialized\n");
 }
 
-void server::query_handler(std::string query) {
+bool server::query_handler(int currentsockfd, std::string query, std::string *username) {
     /*
     /reg/user/password - reg query
     /log/user/password - log query
     */
+    bool res;
+    if (query.size() <= 1) return false;
     size_t l_pos, r_pos;
-    std::string cmd, q_user, q_password;
-
-    r_pos = query.find('/', 1);
+    std::string cmd;
+    if ((r_pos = query.find('/', 1)) == std::string::npos)
+        return false;
     cmd = {query.begin() + 1, query.begin() + r_pos};
     l_pos = r_pos + 1;
-    r_pos = query.find('/', l_pos);
+    if ((r_pos = query.find('/', l_pos)) == std::string::npos)
+        return false;
     current_user.login = {query.begin() + l_pos, query.begin() + r_pos};
     l_pos = r_pos + 1 ;
     current_user.password = {query.begin() + l_pos, query.end()};
 
-    if (cmd == "reg") {
-        if (!DB->reg_user(&current_user)){
-            printf("%s's already taken!\n", current_user.login.c_str());
-            return;
-        }
-        printf("%s registred!\n", current_user.login.c_str());
-    }
-    else if (cmd == "log") {
-        if (!DB->log_user(&current_user)){
-            printf("Check login or password\n");
-            return;
-        }
-        printf("%s logged!\n", current_user.login.c_str());
-    }
+    if (cmd == "reg")
+        res = DB->reg_user(&current_user);
+    else if (cmd == "log")
+        res = DB->log_user(&current_user);
+    if (res) *(username) = current_user.login;
+    return res;
 }
 
-void server::recieve(int currentsockfd, std::string username) {
+void server::recieve(int currentsockfd, std::string *username) {
     memset(buf, 0, sizeof(buf));
     n = recv(currentsockfd, buf, MAXLINE, 0);
     if (n == 0 || n == -1) {
@@ -74,21 +69,27 @@ void server::recieve(int currentsockfd, std::string username) {
         char ip[32];
         uint16_t port = htons(cliaddr.sin_port);
         inet_ntop(AF_INET, &cliaddr.sin_addr, ip, INET_ADDRSTRLEN);
-        printf("'%s' disconected from <%s:%d>\n", username.c_str(), ip, port);
+        printf("'%s' disconected from <%s:%d>\n", username->c_str(), ip, port);
         close(currentsockfd);
         return;
     }
     
     printf("%s\n", buf);
     if (buf[0] == '/') {
-        std::string query(buf);
-        query_handler(query);
+        std::string query(buf), answer, confirm_username;
+        answer = "/f";
+        if (query_handler(currentsockfd, query, username)) {
+            answer = "/s";
+        }
+        send(currentsockfd, answer.c_str(), 2, 0);
         return;
     }
 
-   for (const auto& [sock, username] : clients) {
-        if (sock != currentsockfd)
-            send(sock, buf, n, 0);
+   if (clients[currentsockfd] != "") {
+        for (const auto& [sock, username] : clients) {
+            if (sock != currentsockfd && username != "")
+                send(sock, buf, n, 0);
+        }
    }
 }
 
@@ -122,9 +123,9 @@ server::proccess() {
             if (sockcount <= 0)
                 continue;
         }
-        for (const auto& [sock, username] : clients) {
+        for (auto& [sock, username] : clients) {
             if (FD_ISSET(sock, &readset)) {
-                recieve(sock, username);
+                recieve(sock, &username);
                 sockcount--;
                 if (sockcount <= 0)
                     break;
