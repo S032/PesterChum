@@ -1,9 +1,6 @@
 #include "server.h"
 
-server::server() 
-    :
-    maxi{ -1 },
-    clilen{sizeof(cliaddr)}
+server::server() : clilen{sizeof(cliaddr)}
 {
     FD_ZERO(&allset);
 }
@@ -34,20 +31,52 @@ void server::init() {
 }
 
 void server::query_handler(std::string query) {
-    printf("it's query!\n");
+    /*
+    /reg/user/password - reg query
+    /log/user/password - log query
+    */
+    size_t l_pos, r_pos;
+    std::string cmd, q_user, q_password;
+
+    r_pos = query.find('/', 1);
+    cmd = {query.begin() + 1, query.begin() + r_pos};
+    l_pos = r_pos + 1;
+    r_pos = query.find('/', l_pos);
+    current_user.login = {query.begin() + l_pos, query.begin() + r_pos};
+    l_pos = r_pos + 1 ;
+    current_user.password = {query.begin() + l_pos, query.end()};
+
+    if (cmd == "reg") {
+        if (!DB->reg_user(&current_user)){
+            printf("%s's already taken!\n", current_user.login.c_str());
+            return;
+        }
+        printf("%s registred!\n", current_user.login.c_str());
+    }
+    else if (cmd == "log") {
+        if (!DB->log_user(&current_user)){
+            printf("Check login or password\n");
+            return;
+        }
+        printf("%s logged!\n", current_user.login.c_str());
+    }
 }
 
 void server::recieve(int currentsockfd, std::string username) {
     memset(buf, 0, sizeof(buf));
-    if ((n = recv(currentsockfd, buf, MAXLINE, 0)) == 0) {
-        close(currentsockfd);
+    n = recv(currentsockfd, buf, MAXLINE, 0);
+    if (n == 0 || n == -1) {
+        FD_CLR(currentsockfd, &readset);
         FD_CLR(currentsockfd, &allset);
-        clients.erase(currentsockfd);
+        sockToDelete.push_back(currentsockfd);
 
+        getpeername(currentsockfd, (SA*) &cliaddr, &clilen);
         char ip[32];
         uint16_t port = htons(cliaddr.sin_port);
         inet_ntop(AF_INET, &cliaddr.sin_addr, ip, INET_ADDRSTRLEN);
-        printf("'%s' disconected form <%s:%d>\n", username, ip, port);
+        printf("'%s' disconected from <%s:%d>\n", username.c_str(), ip, port);
+        close(currentsockfd);
+        return;
     }
     
     printf("%s\n", buf);
@@ -101,6 +130,10 @@ server::proccess() {
                     break;
             }
         }
+        for (int sock : sockToDelete) {
+            clients.erase(sock);   
+        }
+        sockToDelete.clear();
     }
 }
 

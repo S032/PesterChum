@@ -8,12 +8,14 @@
 #include <string>
 #include <string.h>
 #include <signal.h>
+#include <vector>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <iostream>
 #include <unordered_map>
+#include <map>
 
 /* Conection Constants */
 #define SERV_PORT 34543
@@ -31,9 +33,10 @@ class server
 private:
     user_t             current_user;
     ChatDatabase       *DB;
-    int                i, maxi, maxfd, listenfd, connfd, currentsockfd;
+    int                maxfd, listenfd, connfd, currentsockfd, err;
     int                sockcount, client[FD_SETSIZE];
-    std::unordered_map<int, std::string> clients;
+    std::map<int, std::string> clients;
+    std::vector<int> sockToDelete; 
     ssize_t            n;
     fd_set             readset, allset;
     char               buf[MAXLINE];
