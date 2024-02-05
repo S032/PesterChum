@@ -24,15 +24,16 @@ private:
     int         servPort = 34543;
     sockaddr_in servAddr;
     QWidget     *Parent;
+    std::vector<char> buffer;
 public:
     void fatal_err(QString);
     void err(QString);
     client(QWidget*);
-    bool check_auth(std::string, std::string);
-    bool reg_user(std::string, std::string);
+    int reg_user(std::string, std::string);
+    int log_user(std::string, std::string);
     int Connect();
     void Close();
-    void writeMessage(std::string);
+    bool writeMessage(std::string);
     std::string readMessage();
 };
 

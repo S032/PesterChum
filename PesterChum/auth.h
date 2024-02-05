@@ -27,7 +27,7 @@ private:
 public:
     client *cl;
 signals:
-    void sendUser(std::string R_user, std::string R_pass, client *cl);
+    void sendUser(std::string R_user, client *cl);
 };
 
 #endif // AUTH_H
