@@ -28,11 +28,31 @@
 /* Acronym */
 #define SA  struct sockaddr
 
+class QuerryHandler {
+private:
+    bool         res;
+    int          current_sock;
+    std::string  *auth_username;
+    std::string  query;
+    ChatDatabase *DB;
+    user_t       usr;
+    std::string  cmd;
+    size_t       l_pos, r_pos;
+public:
+    QuerryHandler(ChatDatabase *Q_DB);
+    bool make_querry(int cur_sock, std::string q_query, std::string *username);
+private:
+    bool log_querry();
+    bool reg_querry();
+    bool sendto_querry();
+};
+
 class server
 {
 private:
     user_t             current_user;
     ChatDatabase       *DB;
+    QuerryHandler      *querry;
     int                maxfd, listenfd, connfd;
     int                sockcount, client[FD_SETSIZE];
     std::map<int, std::string> clients;
@@ -48,7 +68,6 @@ public:
     void start();
     void stop();
 private:
-    bool query_handler(int, std::string, std::string*);
     void exit_err(const char*);
     void init();
     void recieve(int, std::string*);

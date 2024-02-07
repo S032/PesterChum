@@ -5,6 +5,8 @@ server::server() : clilen{sizeof(cliaddr)}
     FD_ZERO(&allset);
 }
 
+QuerryHandler::QuerryHandler(ChatDatabase *Q_DB) : DB{Q_DB}{};
+
 void server::exit_err(const char* err_text) {
     perror(err_text);
     exit(EXIT_FAILURE);
@@ -26,35 +28,62 @@ void server::init() {
     printf("Success\n");
 
     DB = new ChatDatabase;
+    querry = new QuerryHandler(DB);
 
     printf("Server initialized\n");
 }
 
-bool server::query_handler(int currentsockfd, std::string query, std::string *username) {
-    /*
-    /reg/user/password - reg query
-    /log/user/password - log query
-    */
-    bool res;
-    if (query.size() <= 1) return false;
-    size_t l_pos, r_pos;
-    std::string cmd;
-    if ((r_pos = query.find('/', 1)) == std::string::npos)
-        return false;
-    cmd = {query.begin() + 1, query.begin() + r_pos};
+bool QuerryHandler::log_querry() {
     l_pos = r_pos + 1;
     if ((r_pos = query.find('/', l_pos)) == std::string::npos)
         return false;
-    current_user.login = {query.begin() + l_pos, query.begin() + r_pos};
+    usr.login = {query.begin() + l_pos, query.begin() + r_pos};
     l_pos = r_pos + 1 ;
-    current_user.password = {query.begin() + l_pos, query.end()};
-
-    if (cmd == "reg")
-        res = DB->reg_user(&current_user);
-    else if (cmd == "log")
-        res = DB->log_user(&current_user);
-    if (res) *(username) = current_user.login;
+    usr.password = {query.begin() + l_pos, query.end()};
+    res = DB->log_user(&usr);
+    if (res) *(auth_username) = usr.login;
     return res;
+}
+
+bool QuerryHandler::reg_querry() {
+    l_pos = r_pos + 1;
+    if ((r_pos = query.find('/', l_pos)) == std::string::npos)
+        return false;
+    usr.login = {query.begin() + l_pos, query.begin() + r_pos};
+    l_pos = r_pos + 1 ;
+    usr.password = {query.begin() + l_pos, query.end()};
+    res = DB->reg_user(&usr);
+    if (res) *(auth_username) = usr.login;
+    return res;
+}
+
+bool QuerryHandler::sendto_querry() {
+    /*/sendto/from_whom/to_whom/message*/
+    return true;
+}
+
+bool QuerryHandler::make_querry(int cur_sock, std::string q_query, std::string *username) {
+    auth_username = username;
+    r_pos = l_pos = 0;
+    query = q_query;
+    bool result;
+    if (query.size() <= 1) return false;
+    if ((r_pos = query.find('/', 1)) == std::string::npos)
+        return false;
+    cmd = {query.begin() + 1, query.begin() + r_pos};
+    if (cmd == "reg") {
+        return reg_querry(); 
+    }
+    else if (cmd == "log") {
+        return log_querry();
+    }
+    else if (cmd == "sendto") {
+        std::cout << "it's send\n";
+    }
+    else {
+        std::cout << "fuck\n";
+    }
+    return true;
 }
 
 void server::recieve(int currentsockfd, std::string *username) {
@@ -78,7 +107,12 @@ void server::recieve(int currentsockfd, std::string *username) {
     if (buf[0] == '/') {
         std::string query(buf), answer, confirm_username;
         answer = "/f";
+        /*
         if (query_handler(currentsockfd, query, username)) {
+            answer = "/s";
+        }
+        */
+        if (querry->make_querry(currentsockfd, query, username)) {
             answer = "/s";
         }
         send(currentsockfd, answer.c_str(), 2, 0);
