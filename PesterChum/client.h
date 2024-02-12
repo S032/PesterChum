@@ -8,24 +8,26 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QWidget>
+#include <QMainWindow>
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdlib.h>
+#include <fstream>
+#include <iostream>
 #include <string>
 
 class client
 {
 private:
     SOCKET      clientSock;
-    std::string servIp = "192.168.1.103";
-    std::string Username;
-    std::string Password;
-    int         servPort = 34543;
+    int         servPort;
+    std::string servIp;
     sockaddr_in servAddr;
     QWidget     *Parent;
     std::vector<char> buffer;
 public:
+    void giveNewParent(QMainWindow*);
     void fatal_err(QString);
     void err(QString);
     client(QWidget*);
@@ -35,6 +37,8 @@ public:
     void Close();
     bool writeMessage(std::string);
     std::string readMessage();
+private:
+    void readIp(std::string);
 };
 
 #endif // CLIENT_H

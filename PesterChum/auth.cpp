@@ -50,10 +50,12 @@ void Auth::on_SignUpButton_clicked() // SIGN UP EVENT
     int res = cl->reg_user(username, password);
     if (res == -1) {
         cl->err("Failed to registratre!");
+        cl->Close();
         return;
     }
     if (res == -2) {
         cl->err("User name's taken!");
+        cl->Close();
         return;
     }
     emit sendUser(username, cl);

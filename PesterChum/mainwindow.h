@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include "auth.h"
 #include "client.h"
+#include "messagethread.h"
+#include "messagemodel.h"
 #include <QMessageBox>
 #include <QListView>
 #include <QStandardItem>
@@ -26,9 +28,12 @@ public:
     ~MainWindow();
     void GotMessageHandler();
     void startThread();
-
+private:
+    void setup_listview();
+    void throw_message();
 private:
     Ui::MainWindow  *ui;
+    MessageModel *model;
     Auth            *reg;
     client          *cl;
     std::string     username;
@@ -38,13 +43,6 @@ public slots:
 private slots:
     void on_pushButton_clicked();
     void on_lineEdit_returnPressed();
-};
-
-class MessageModel : public QStandardItemModel
-{
-public:
-    MessageModel(QObject *parent = nullptr) : QStandardItemModel(parent) {}
-    void addMessage(const QString &text);
 };
 
 #endif // MAINWINDOW_H

@@ -1,5 +1,10 @@
 #include "client.h"
 
+void client::giveNewParent(QMainWindow *NewParent)
+{
+    Parent = NewParent;
+}
+
 void
 client::fatal_err(QString err) {
     QMessageBox::critical(Parent, "FATAL ERROR", err);
@@ -11,7 +16,25 @@ client::err(QString err) {
     QMessageBox::warning(Parent, "WARNING", err);
 }
 
-client::client(QWidget *parent) {
+void client::readIp(std::string filename)
+{
+    std::ifstream ipfile(filename);
+
+    if (ipfile.is_open()) {
+        std::getline(ipfile, servIp);
+        ipfile.close();
+    }
+    else
+        fatal_err(("can't find " + filename + "!").c_str());
+    if (servIp.empty()) fatal_err("ip's empty!");
+}
+
+client::client(QWidget *parent)
+    :
+    servPort(34543),
+    servIp("192.168.1.103")
+    //84.201.157.25:26098 - real server
+{
     buffer.reserve(MAXLINE);
     Parent = parent;
     WSADATA wsaData;

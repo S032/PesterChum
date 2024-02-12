@@ -12,12 +12,16 @@ SOURCES += \
     auth.cpp \
     client.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    messagemodel.cpp \
+    messagethread.cpp
 
 HEADERS += \
     auth.h \
     client.h \
-    mainwindow.h
+    mainwindow.h \
+    messagemodel.h \
+    messagethread.h
 
 FORMS += \
     auth.ui \
