@@ -15,43 +15,62 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    model = new MessageModel(this, ui);
-    reg = new Auth;
+    cl = new client(this);
+    QObject::connect(cl, &client::throwFatalError, this, &MainWindow::proccesFatalError);
+    QObject::connect(cl, &client::throwError, this, &MainWindow::proccesError);
+    reg = new Auth(nullptr, cl);
     reg->show();
-    setup_listview();
 
     connect(reg, &Auth::sendUser, this, &MainWindow::startChat);
 }
 
 MainWindow::~MainWindow()
 {
-    reader->join();
-    delete reader;
+    ReadThread->stop();
+    delete ReadThread;
     delete ui;
 }
 
-/////////////////////////////////////////////////////////////////////
-void MainWindow::GotMessageHandler() //получение сообщения от сервера
+void MainWindow::proccesFatalError(QString error)
 {
-    while(true) {
-        model->addMessage(cl->readMessage().c_str(), "blue");
-    }
+    //QMessageBox::critical(this, "FATAL ERROR", error);
+    printf("bruh\n");
+    exit(EXIT_FAILURE);
 }
 
-void MainWindow::startThread() //поток для отдельного чтения
+void MainWindow::proccesError(QString error)
 {
-    reader = new std::thread(&MainWindow::GotMessageHandler, this);
+    QMessageBox::warning(this, "WARNING", error);
 }
-///////////////////////////////////////////////////////////////////
+
+void MainWindow::handleResult(std::string result)
+{
+    model->addMessage(result.c_str(), "blue");
+}
+
+void MainWindow::startReadInThread(client *cl)
+{
+    MessageThread *ReadThread = new MessageThread(this, cl);
+    connect(ReadThread, &MessageThread::resultReady, this, &MainWindow::handleResult);
+    connect(ReadThread, &MessageThread::finished, this, &QObject::deleteLater);
+    ReadThread->start();
+}
 
 void MainWindow::startChat(std::string S_user, client *auth_cl)
 {
     cl = auth_cl;
-    cl->giveNewParent(this);
+    auth_cl->giveNewParent(this);
+    model = new MessageModel(this, ui);
+    startReadInThread(auth_cl);
     username = S_user;
+    setup_listview();
     ui->label->setText(username.c_str());
     this->show();
-    startThread();
+}
+
+void MainWindow::FinishThread()
+{
+    ReadThread->wait();
 }
 
 void MainWindow::throw_message()
@@ -70,7 +89,6 @@ void MainWindow::on_pushButton_clicked()
 {
     throw_message();
 }
-
 
 void MainWindow::on_lineEdit_returnPressed()
 {

@@ -1,16 +1,15 @@
 #include "auth.h"
 #include "ui_auth.h"
 #include "mainwindow.h"
-//#include "client.h"
 #include <QLineEdit>
 #include <string>
 
-Auth::Auth(QWidget *parent)
+Auth::Auth(QWidget *parent, client *m_cl)
     : QDialog(parent)
     , ui(new Ui::Auth)
+    , cl(m_cl)
 {
     ui->setupUi(this);
-    cl = new client(this);
     ui->passwordLine->setEchoMode(QLineEdit::Password);
 }
 
@@ -27,12 +26,12 @@ void Auth::on_SignInButton_clicked() // SIGN IN EVENT
     cl->Connect();
     int res = cl->log_user(username, password);
     if (res == -1) {
-        cl->err("Failed to sign in!");
+        cl->emit throwError("Failed to sign in!");
         cl->Close();
         return;
     }
     if (res == -2) {
-        cl->err("Check ur login or password!");
+        cl->emit throwError("Check ur login or password!");
         cl->Close();
         return;
     }
@@ -49,12 +48,12 @@ void Auth::on_SignUpButton_clicked() // SIGN UP EVENT
     cl->Connect();
     int res = cl->reg_user(username, password);
     if (res == -1) {
-        cl->err("Failed to registratre!");
+        cl->emit throwError("Failed to registratre!");
         cl->Close();
         return;
     }
     if (res == -2) {
-        cl->err("User name's taken!");
+        cl->emit throwError("User name's taken!");
         cl->Close();
         return;
     }

@@ -8,25 +8,12 @@ void client::giveNewParent(QMainWindow *NewParent)
 void
 client::fatal_err(QString err) {
     QMessageBox::critical(Parent, "FATAL ERROR", err);
-    QApplication::quit();
+    exit(EXIT_FAILURE);
 }
 
 void
 client::err(QString err) {
     QMessageBox::warning(Parent, "WARNING", err);
-}
-
-void client::readIp(std::string filename)
-{
-    std::ifstream ipfile(filename);
-
-    if (ipfile.is_open()) {
-        std::getline(ipfile, servIp);
-        ipfile.close();
-    }
-    else
-        fatal_err(("can't find " + filename + "!").c_str());
-    if (servIp.empty()) fatal_err("ip's empty!");
 }
 
 client::client(QWidget *parent)
@@ -51,7 +38,7 @@ client::Connect() {
     if ((clientSock = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
         fatal_err("Failed to create socket");
     int erStat;
-    if ((erStat = connect(clientSock, (SA*) &servAddr, sizeof(servAddr))) == SOCKET_ERROR)
+    if ((erStat = ::connect(clientSock, (SA*) &servAddr, sizeof(servAddr))) == SOCKET_ERROR)
         err("Failed to connect to server");
     return erStat;
 }
@@ -73,7 +60,8 @@ std::string client::readMessage()
     std::vector<char> buff(MAXLINE);
     memset(buff.data(), 0, buff.size());
     if(recv(clientSock, buff.data(), buff.size(), 0) == 0) {
-        fatal_err("Server terminated prematurely");
+        //fatal_err("Server terminated prematurely");
+        emit throwFatalError("Server terminated prematurely");
     }
     return buff.data();
 }

@@ -8,24 +8,25 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QWidget>
+#include <QObject>
 #include <QMainWindow>
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include <stdlib.h>
-#include <fstream>
-#include <iostream>
 #include <string>
 
-class client
+class client : public QObject
 {
+    Q_OBJECT
 private:
     SOCKET      clientSock;
     int         servPort;
     std::string servIp;
     sockaddr_in servAddr;
-    QWidget     *Parent;
     std::vector<char> buffer;
+    QWidget     *Parent;
+public:
+    bool *m_isRunning;
 public:
     void giveNewParent(QMainWindow*);
     void fatal_err(QString);
@@ -37,8 +38,9 @@ public:
     void Close();
     bool writeMessage(std::string);
     std::string readMessage();
-private:
-    void readIp(std::string);
+signals:
+    void throwFatalError(QString errortext);
+    void throwError(QString errortext);
 };
 
 #endif // CLIENT_H
