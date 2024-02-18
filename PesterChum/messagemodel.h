@@ -3,6 +3,7 @@
 
 #include "ui_mainwindow.h"
 #include <QListView>
+#include <QColor>
 #include <QStandardItem>
 #include <QStandardItemModel>
 

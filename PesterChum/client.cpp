@@ -46,6 +46,7 @@ client::Connect() {
 void
 client::Close() {
     closesocket(clientSock);
+    WSACleanup();
 }
 
 bool client::writeMessage(std::string message)
@@ -55,15 +56,15 @@ bool client::writeMessage(std::string message)
     return true;
 }
 
-std::string client::readMessage()
+bool client::readMessage(std::string &message)
 {
     std::vector<char> buff(MAXLINE);
     memset(buff.data(), 0, buff.size());
     if(recv(clientSock, buff.data(), buff.size(), 0) == 0) {
-        //fatal_err("Server terminated prematurely");
-        emit throwFatalError("Server terminated prematurely");
+        return false;
     }
-    return buff.data();
+    message = buff.data();
+    return true;
 }
 
 int

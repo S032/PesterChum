@@ -8,6 +8,7 @@ void MainWindow::setup_listview()
     ui->listView->setSelectionMode(QAbstractItemView::NoSelection);
     ui->listView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->listView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //Wui->listView->setItemDelegate(new ColoredItemDelegate(ui->listView));
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -26,15 +27,14 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    ReadThread->stop();
     delete ReadThread;
     delete ui;
 }
 
 void MainWindow::proccesFatalError(QString error)
 {
-    //QMessageBox::critical(this, "FATAL ERROR", error);
-    printf("bruh\n");
+    delete ReadThread;
+    QMessageBox::critical(this, "FATAL ERROR", error);
     exit(EXIT_FAILURE);
 }
 
@@ -43,17 +43,11 @@ void MainWindow::proccesError(QString error)
     QMessageBox::warning(this, "WARNING", error);
 }
 
-void MainWindow::handleResult(std::string result)
-{
-    model->addMessage(result.c_str(), "blue");
-}
-
 void MainWindow::startReadInThread(client *cl)
 {
-    MessageThread *ReadThread = new MessageThread(this, cl);
-    connect(ReadThread, &MessageThread::resultReady, this, &MainWindow::handleResult);
-    connect(ReadThread, &MessageThread::finished, this, &QObject::deleteLater);
-    ReadThread->start();
+    ReadThread = new ThreadController(cl, model);
+    QObject::connect(ReadThread, &ThreadController::throwFatalError, this, &MainWindow::proccesFatalError);
+    ReadThread->emit startRead(cl);
 }
 
 void MainWindow::startChat(std::string S_user, client *auth_cl)
@@ -68,15 +62,10 @@ void MainWindow::startChat(std::string S_user, client *auth_cl)
     this->show();
 }
 
-void MainWindow::FinishThread()
-{
-    ReadThread->wait();
-}
-
 void MainWindow::throw_message()
 {
     std::string message = ui->lineEdit->text().toStdString();
-
+    qDebug() << ReadThread;
     if (!message.empty()) {
         message = username + ": " +message;
         model->addMessage(message.c_str(), "red");

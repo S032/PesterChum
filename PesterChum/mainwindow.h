@@ -11,6 +11,7 @@
 #include <QStandardItem>
 #include <QStandardItemModel>
 #include <QThread>
+#include <QDebug>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -30,18 +31,16 @@ private:
     void throw_message();
     void startReadInThread(client *client);
 private:
-    Ui::MainWindow  *ui;
-    MessageModel    *model;
-    MessageThread   *ReadThread;
-    Auth            *reg;
-    client          *cl;
-    std::string     username;
+    Ui::MainWindow   *ui;
+    MessageModel     *model;
+    ThreadController *ReadThread;
+    Auth             *reg;
+    client           *cl;
+    std::string      username;
 public slots:
     void proccesFatalError(QString error);
     void proccesError(QString error);
     void startChat(std::string S_user, client *cl);
-    void handleResult(std::string result);
-    void FinishThread();
 private slots:
     void on_pushButton_clicked();
     void on_lineEdit_returnPressed();

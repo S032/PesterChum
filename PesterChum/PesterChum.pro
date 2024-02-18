@@ -13,6 +13,7 @@ CONFIG += thread
 SOURCES += \
     auth.cpp \
     client.cpp \
+    coloredmessagedelegate.cpp \
     main.cpp \
     mainwindow.cpp \
     messagemodel.cpp \
@@ -21,6 +22,7 @@ SOURCES += \
 HEADERS += \
     auth.h \
     client.h \
+    coloredmessagedelegate.h \
     mainwindow.h \
     messagemodel.h \
     messagethread.h

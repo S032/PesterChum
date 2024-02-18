@@ -1,21 +1,45 @@
 #include "messagethread.h"
 
-MessageThread::MessageThread(QObject *parent, client *m_cl)
+ThreadController::ThreadController(client *r_cl, MessageModel *r_model)
     :
-    QThread(parent),
-    m_isRunning(true),
-    cl(m_cl)
-{}
+    cl(r_cl),
+    model(r_model)
+{
+    reader = new MessageReader;
+    reader->moveToThread(&readerThread);
+    connect(&readerThread, &QThread::finished, reader, &QObject::deleteLater);
+    connect(this, &ThreadController::startRead, reader, &MessageReader::doWork);
+    connect(reader, &MessageReader::resultReady, this, &ThreadController::handleResults);
+    connect(reader, &MessageReader::makeFatalError, this, &ThreadController::throwFatalErrorOccuried);
+    readerThread.start();
+}
 
-void MessageThread::run()
+ThreadController::~ThreadController()
+{
+    cl->Close();
+    readerThread.quit();
+    readerThread.wait();
+}
+
+void MessageReader::doWork(client *cl)
 {
     while(m_isRunning) {
         std::string result;
-        result = cl->readMessage();
+        if(!cl->readMessage(result)) {
+            m_isRunning = false;
+            emit makeFatalError("Server terminated");
+        }
         emit resultReady(result);
     }
 }
 
-void MessageThread::stop() {
-    //m_isRunning = false;
+
+void ThreadController::handleResults(std::string message)
+{
+    model->addMessage(message.c_str(), "blue");
+}
+
+void ThreadController::throwFatalErrorOccuried(QString errortext)
+{
+    emit throwFatalError(errortext);
 }

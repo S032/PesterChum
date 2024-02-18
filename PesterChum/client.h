@@ -13,6 +13,7 @@
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <windows.h>
 #include <string>
 
 class client : public QObject
@@ -37,7 +38,7 @@ public:
     int Connect();
     void Close();
     bool writeMessage(std::string);
-    std::string readMessage();
+    bool readMessage(std::string &);
 signals:
     void throwFatalError(QString errortext);
     void throwError(QString errortext);
