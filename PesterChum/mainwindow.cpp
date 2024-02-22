@@ -8,7 +8,8 @@ void MainWindow::setup_listview()
     ui->listView->setSelectionMode(QAbstractItemView::NoSelection);
     ui->listView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->listView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    //Wui->listView->setItemDelegate(new ColoredItemDelegate(ui->listView));
+    delegate = new ColoredMessageDelegate(ui->listView, ui->listView);
+    ui->listView->setItemDelegate(delegate);
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -27,12 +28,14 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    cl->Close();
     delete ReadThread;
     delete ui;
 }
 
 void MainWindow::proccesFatalError(QString error)
 {
+    cl->Close();
     delete ReadThread;
     QMessageBox::critical(this, "FATAL ERROR", error);
     exit(EXIT_FAILURE);
@@ -65,10 +68,9 @@ void MainWindow::startChat(std::string S_user, client *auth_cl)
 void MainWindow::throw_message()
 {
     std::string message = ui->lineEdit->text().toStdString();
-    qDebug() << ReadThread;
     if (!message.empty()) {
         message = username + ": " +message;
-        model->addMessage(message.c_str(), "red");
+        model->addMessage(message.c_str(), Qt::blue);
         cl->writeMessage(message);
         ui->lineEdit->clear();
     }

@@ -16,7 +16,6 @@ ThreadController::ThreadController(client *r_cl, MessageModel *r_model)
 
 ThreadController::~ThreadController()
 {
-    cl->Close();
     readerThread.quit();
     readerThread.wait();
 }
@@ -25,18 +24,21 @@ void MessageReader::doWork(client *cl)
 {
     while(m_isRunning) {
         std::string result;
-        if(!cl->readMessage(result)) {
+        int z = cl->readMessage(result);
+        if(z == 0) {
             m_isRunning = false;
             emit makeFatalError("Server terminated");
+        }
+        if(z == -1) {
+            m_isRunning = false;
         }
         emit resultReady(result);
     }
 }
 
-
 void ThreadController::handleResults(std::string message)
 {
-    model->addMessage(message.c_str(), "blue");
+    model->addMessage(message.c_str(), Qt::red);
 }
 
 void ThreadController::throwFatalErrorOccuried(QString errortext)

@@ -45,7 +45,8 @@ client::Connect() {
 
 void
 client::Close() {
-    closesocket(clientSock);
+    //closesocket(clientSock);
+    shutdown(clientSock, 0);
     WSACleanup();
 }
 
@@ -56,15 +57,13 @@ bool client::writeMessage(std::string message)
     return true;
 }
 
-bool client::readMessage(std::string &message)
+int client::readMessage(std::string &message)
 {
     std::vector<char> buff(MAXLINE);
     memset(buff.data(), 0, buff.size());
-    if(recv(clientSock, buff.data(), buff.size(), 0) == 0) {
-        return false;
-    }
+    int res = recv(clientSock, buff.data(), buff.size(), 0);
     message = buff.data();
-    return true;
+    return res;
 }
 
 int

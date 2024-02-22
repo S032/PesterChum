@@ -6,6 +6,7 @@
 #include "client.h"
 #include "messagethread.h"
 #include "messagemodel.h"
+#include "coloredmessagedelegate.h"
 #include <QMessageBox>
 #include <QListView>
 #include <QStandardItem>
@@ -34,6 +35,7 @@ private:
     Ui::MainWindow   *ui;
     MessageModel     *model;
     ThreadController *ReadThread;
+    ColoredMessageDelegate *delegate;
     Auth             *reg;
     client           *cl;
     std::string      username;
