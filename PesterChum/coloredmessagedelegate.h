@@ -20,8 +20,6 @@ private:
 
     QString splitUnitText(QString unitText, const QStyleOptionViewItem &option) const;
 
-    void setMessageType(const QModelIndex &index, bool isSentByUser);
-
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 

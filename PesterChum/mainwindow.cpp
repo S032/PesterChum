@@ -53,8 +53,7 @@ void MainWindow::startReadInThread(client *cl)
     ReadThread->emit startRead(cl);
 }
 
-void MainWindow::startChat(std::string S_user, client *auth_cl)
-{
+void MainWindow::startChat(std::string S_user, client *auth_cl) {
     cl = auth_cl;
     auth_cl->giveNewParent(this);
     model = new MessageModel(this, ui);
@@ -65,8 +64,7 @@ void MainWindow::startChat(std::string S_user, client *auth_cl)
     this->show();
 }
 
-void MainWindow::throw_message()
-{
+void MainWindow::throw_message() {
     std::string message = ui->lineEdit->text().toStdString();
     if (!message.empty()) {
         message = username + ": " +message;
@@ -76,13 +74,11 @@ void MainWindow::throw_message()
     }
 }
 
-void MainWindow::on_pushButton_clicked()
-{
+void MainWindow::on_pushButton_clicked() {
     throw_message();
 }
 
-void MainWindow::on_lineEdit_returnPressed()
-{
+void MainWindow::on_lineEdit_returnPressed() {
     throw_message();
 }
 

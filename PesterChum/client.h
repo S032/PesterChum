@@ -30,8 +30,6 @@ public:
     bool *m_isRunning;
 public:
     void giveNewParent(QMainWindow*);
-    void fatal_err(QString);
-    void err(QString);
     client(QWidget*);
     int reg_user(std::string, std::string);
     int log_user(std::string, std::string);

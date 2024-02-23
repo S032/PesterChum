@@ -5,28 +5,17 @@ void client::giveNewParent(QMainWindow *NewParent)
     Parent = NewParent;
 }
 
-void
-client::fatal_err(QString err) {
-    QMessageBox::critical(Parent, "FATAL ERROR", err);
-    exit(EXIT_FAILURE);
-}
-
-void
-client::err(QString err) {
-    QMessageBox::warning(Parent, "WARNING", err);
-}
-
 client::client(QWidget *parent)
     :
-    servPort(34543),
-    servIp("192.168.1.103")
+    servPort(26098),
+    servIp("84.201.157.25")
     //84.201.157.25:26098 - real server
 {
     buffer.reserve(MAXLINE);
     Parent = parent;
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
-        fatal_err("Failed to init Winsock");
+        emit throwFatalError("Failed to init Winsock");
 
     servAddr.sin_family = AF_INET;
     inet_pton(AF_INET, servIp.c_str(), &servAddr.sin_addr.s_addr);
@@ -36,29 +25,25 @@ client::client(QWidget *parent)
 int
 client::Connect() {
     if ((clientSock = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
-        fatal_err("Failed to create socket");
+        emit throwFatalError("Failed to create socket");
     int erStat;
     if ((erStat = ::connect(clientSock, (SA*) &servAddr, sizeof(servAddr))) == SOCKET_ERROR)
-        err("Failed to connect to server");
+        emit throwError("Failed to connect to server");
     return erStat;
 }
 
 void
 client::Close() {
-    //closesocket(clientSock);
-    shutdown(clientSock, 0);
-    WSACleanup();
+    closesocket(clientSock);
 }
 
-bool client::writeMessage(std::string message)
-{
+bool client::writeMessage(std::string message) {
     if(send(clientSock, message.c_str(), message.size(), 0) < 0)
         return false;
     return true;
 }
 
-int client::readMessage(std::string &message)
-{
+int client::readMessage(std::string &message) {
     std::vector<char> buff(MAXLINE);
     memset(buff.data(), 0, buff.size());
     int res = recv(clientSock, buff.data(), buff.size(), 0);
@@ -66,8 +51,7 @@ int client::readMessage(std::string &message)
     return res;
 }
 
-int
-client::reg_user(std::string username, std::string password) {
+int client::reg_user(std::string username, std::string password) {
     std::string querry = "/reg/" + username + "/" + password;
     if (send(clientSock, querry.c_str(), querry.size(), 0) < 0)
         return -1;
@@ -78,8 +62,7 @@ client::reg_user(std::string username, std::string password) {
     return 0;
 }
 
-int
-client::log_user(std::string username, std::string password) {
+int client::log_user(std::string username, std::string password) {
     std::string querry = "/log/" + username + "/" + password;
     if (send(clientSock, querry.c_str(), querry.size(), 0) < 0)
         return -1;
