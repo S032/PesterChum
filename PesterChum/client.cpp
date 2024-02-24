@@ -7,8 +7,8 @@ void client::giveNewParent(QMainWindow *NewParent)
 
 client::client(QWidget *parent)
     :
-    servPort(26098),
-    servIp("84.201.157.25")
+    servPort(34543),
+    servIp("192.168.1.103")
     //84.201.157.25:26098 - real server
 {
     buffer.reserve(MAXLINE);

@@ -1,9 +1,8 @@
 #include "messagethread.h"
 
-ThreadController::ThreadController(client *r_cl, MessageModel *r_model)
+ThreadController::ThreadController(client *r_cl)
     :
-    cl(r_cl),
-    model(r_model)
+    cl(r_cl)
 {
     reader = new MessageReader;
     reader->moveToThread(&readerThread);
@@ -38,7 +37,7 @@ void MessageReader::doWork(client *cl)
 
 void ThreadController::handleResults(std::string message)
 {
-    model->addMessage(message.c_str(), Qt::red);
+    //model->addMessage(message.c_str(), Qt::red);
 }
 
 void ThreadController::throwFatalErrorOccuried(QString errortext)

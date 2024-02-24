@@ -20,7 +20,8 @@ private slots:
     void on_SignUpButton_clicked();
 private:
     Ui::Auth *ui;
-
+private:
+    void setup_font();
 public:
     client *cl;
 signals:

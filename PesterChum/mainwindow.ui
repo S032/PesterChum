@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>552</width>
+    <height>855</height>
    </rect>
   </property>
   <property name="font">
@@ -17,24 +17,23 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Готов достать кого нибудь?</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">
-    background-color: #f39c12;
+   <string notr="true">    background-color: rgba(255, 181, 0, 1);
     color: #ffffff;
-    border: 1px solid #d35400;
     padding: 5px 10px;
-    border-radius: 3px;</string>
+    border-radius: 3px;
+    border-radius: 0;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QListView" name="listView">
+   <widget class="QListView" name="UserList">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>60</y>
-      <width>671</width>
-      <height>341</height>
+      <x>30</x>
+      <y>240</y>
+      <width>491</width>
+      <height>221</height>
      </rect>
     </property>
     <property name="font">
@@ -45,9 +44,11 @@
     </property>
     <property name="styleSheet">
      <string notr="true">QListView {
-	background-color: #ffffff;
-	color: #000000
-}</string>
+	background-color: #000000;
+	color: #ffffff;
+    border: 5px solid #fff700;
+}
+</string>
     </property>
     <property name="resizeMode">
      <enum>QListView::Fixed</enum>
@@ -68,106 +69,401 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>460</y>
-      <width>121</width>
-      <height>31</height>
+      <x>10</x>
+      <y>-10</y>
+      <width>531</width>
+      <height>81</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Bahnschrift</family>
-      <pointsize>14</pointsize>
+      <family>MS Serif</family>
+      <pointsize>32</pointsize>
+      <bold>false</bold>
      </font>
     </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: #f1c40f;
-color: #8B4513
-</string>
-    </property>
     <property name="text">
-     <string>username*</string>
+     <string>ДОСТАНЬКОРЕША 6.0</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>420</y>
-      <width>671</width>
-      <height>36</height>
+      <x>30</x>
+      <y>60</y>
+      <width>491</width>
+      <height>131</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLineEdit" name="lineEdit">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-         <horstretch>4</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="font">
-        <font>
-         <family>Bahnschrift</family>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: #ffffff;
-color: #000000</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>1</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="font">
-        <font>
-         <family>Bahnschrift</family>
-         <pointsize>16</pointsize>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-background-color: #f1c40f;
-color: #8B4513;
+    <property name="font">
+     <font>
+      <family>MS Serif</family>
+      <pointsize>32</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">	background-color: #000000;
+	color: #ffffff;
+    border: 5px solid #fff700;</string>
+    </property>
+    <property name="text">
+     <string>ЧАТ-КЛИЕНТ</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>200</y>
+      <width>321</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Serif</family>
+      <pointsize>26</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string>КОРЕШСПИСОК:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>470</y>
+      <width>221</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Serif</family>
+      <pointsize>26</pointsize>
+     </font>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+background-color: #fff700;
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
 }
 
 QPushButton:hover {
-background-color: #FFFF00;
-color: #8B4513;
+background-color: rgb(244, 255, 39);
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}</string>
+    </property>
+    <property name="text">
+     <string>ДОСТАТЬ!</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="MyUserName">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>530</y>
+      <width>331</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Serif</family>
+      <pointsize>26</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string>МОЙКОРЕШНИК:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="UserName">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>570</y>
+      <width>491</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>22</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">	background-color: #000000;
+	color: #ffffff;
+    border: 5px solid #fff700;</string>
+    </property>
+    <property name="text">
+     <string>UserName</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="Mood">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>630</y>
+      <width>331</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Serif</family>
+      <pointsize>26</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string>НАСТРОЕНИЕ:</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="gridLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>29</x>
+      <y>669</y>
+      <width>497</width>
+      <height>173</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="2" column="1">
+      <widget class="QPushButton" name="pushButton_3">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Serif</family>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+background-color: rgb(255, 0, 0);
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
 }
-</string>
+
+QPushButton:hover {
+background-color: rgb(255, 65, 17);
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}</string>
        </property>
        <property name="text">
-        <string>Send</string>
+        <string>ЗЛОБНОЕ</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="pushButton_7">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Serif</family>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+background-color: #fff700;
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}
+
+QPushButton:hover {
+background-color: rgb(244, 255, 39);
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}</string>
+       </property>
+       <property name="text">
+        <string>БОДРОЕ</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="pushButton_4">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Serif</family>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+background-color: #fff700;
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}
+
+QPushButton:hover {
+background-color: rgb(244, 255, 39);
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}</string>
+       </property>
+       <property name="text">
+        <string>ЭНЕРГИЧНОЕ</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Serif</family>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+background-color: #fff700;
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}
+
+QPushButton:hover {
+background-color: rgb(244, 255, 39);
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}</string>
+       </property>
+       <property name="text">
+        <string>ЗАДОРНОЕ</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="pushButton_5">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Serif</family>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+background-color: #fff700;
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}
+
+QPushButton:hover {
+background-color: rgb(244, 255, 39);
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}</string>
+       </property>
+       <property name="text">
+        <string>ДРУЖЕСКОЕ</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QPushButton" name="pushButton_6">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Serif</family>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+background-color: #fff700;
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}
+
+QPushButton:hover {
+background-color: rgb(244, 255, 39);
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}</string>
+       </property>
+       <property name="text">
+        <string>КОРЕШОВОЕ</string>
        </property>
       </widget>
      </item>
     </layout>
    </widget>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>33</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>

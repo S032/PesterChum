@@ -29,7 +29,7 @@ private:
     client *cl;
     MessageModel *model;
 public:
-    ThreadController(client *r_cl, MessageModel *r_model);
+    ThreadController(client *r_cl);
     ~ThreadController();
 public slots:
     void handleResults(std::string message);

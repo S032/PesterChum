@@ -15,7 +15,7 @@ QSize ColoredMessageDelegate::sizeHint(const QStyleOptionViewItem &option, const
     text = splitUnitText(text, option);
 
     // creating object for size calculation
-    QFont font("Bahnschrift", 15);
+    QFont font("MS Serif", 20);
     QFontMetrics fm(font);
 
     // size caclulation
@@ -31,7 +31,7 @@ QString ColoredMessageDelegate::splitUnitText(QString unitText, const QStyleOpti
 {
     int listViewSizePx = listView->width() - 20;
     QString newText;
-    QFont font("Bahnschrift", 15);
+    QFont font("MS Serif", 20);
     QFontMetrics fm(font);
 
     int wordLength = 0;
