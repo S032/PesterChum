@@ -95,3 +95,25 @@ bool ChatDatabase::log_user(user_t *user) {
         return false;
     }
 }
+
+bool ChatDatabase::getListOfUsers(std::string *answer, user_t *user) {
+    try
+    {
+        *(answer) = "/";
+        sql::SQLString query = "SELECT US2.UserName FROM Chats AS CH";
+        query += " INNER JOIN User AS US1 ON CH.User1 = US1.ID";
+        query += " INNER JOIN User AS US2 ON CH.User2 = US2.ID";
+        query += " WHERE US1.UserName = '"+user->login+"'";
+        stmt = conn->createStatement();
+        rs = stmt->executeQuery(query);
+        while(rs->next()) {
+            *(answer) += rs->getString("UserName") + "/";
+        }
+        return true;
+    }
+    catch(sql::SQLException &e)
+    {
+        print_err(e);
+        return false;
+    }
+}

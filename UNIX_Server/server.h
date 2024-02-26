@@ -32,6 +32,7 @@ class QuerryHandler {
 private:
     bool         res;
     int          current_sock;
+    std::string  answer;
     std::string  *auth_username;
     std::string  query;
     ChatDatabase *DB;
@@ -42,9 +43,10 @@ public:
     QuerryHandler(ChatDatabase *Q_DB);
     bool make_querry(int cur_sock, std::string q_query, std::string *username);
 private:
-    bool log_querry();
-    bool reg_querry();
-    bool sendto_querry();
+    std::string log_querry();
+    std::string reg_querry();
+    std::string sendto_querry();
+    std::string giveListOfUser();
 };
 
 class server
