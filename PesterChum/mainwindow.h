@@ -4,11 +4,12 @@
 #include <QMainWindow>
 #include "auth.h"
 #include "client.h"
+#include "userchat.h"
 #include "messagethread.h"
-#include "messagemodel.h"
 #include "coloredmessagedelegate.h"
 #include <QMessageBox>
 #include <QListView>
+#include <QFontDatabase>
 #include <QStandardItem>
 #include <QStandardItemModel>
 #include <QThread>
@@ -29,23 +30,26 @@ public:
     ~MainWindow();
 private:
     void setup_listview();
+    void setup_font();
     void throw_message();
     void startReadInThread(client *client);
 private:
-    Ui::MainWindow   *ui;
-    MessageModel     *model;
-    ThreadController *ReadThread;
+    Ui::MainWindow         *ui;
+    ThreadController       *ReadThread;
     ColoredMessageDelegate *delegate;
-    Auth             *reg;
-    client           *cl;
-    std::string      username;
+    Auth                   *reg;
+    client                 *cl;
+    std::string            username;
+    QString                fontFamily;
 public slots:
     void proccesFatalError(QString error);
     void proccesError(QString error);
-    void startChat(std::string S_user, client *cl);
+    void start(std::string S_user, client *cl);
+signals:
+    void startChat(std::string S_user, client *cl, QString fontFamily);
 private slots:
-    void on_pushButton_clicked();
-    void on_lineEdit_returnPressed();
+    //void on_pushButton_clicked();
+    //void on_lineEdit_returnPressed();
 };
 
 #endif // MAINWINDOW_H

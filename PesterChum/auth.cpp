@@ -4,6 +4,22 @@
 #include <QLineEdit>
 #include <string>
 
+void Auth::setup_font()
+{
+    int id = QFontDatabase::addApplicationFont(":/fonts/ChixaDemibold.ttf");
+    QString fontFamily = QFontDatabase::applicationFontFamilies(id).at(0);
+    QFont pixelFont(fontFamily);
+    pixelFont.setPixelSize(62);
+    pixelFont.setBold(true);
+
+    ui->label_3->setFont(pixelFont);
+    pixelFont.setPixelSize(40);
+    ui->label->setFont(pixelFont);
+    ui->label_2->setFont(pixelFont);
+    ui->SignUpButton->setFont(pixelFont);
+    ui->SignInButton->setFont(pixelFont);
+}
+
 Auth::Auth(QWidget *parent, client *m_cl)
     : QDialog(parent)
     , ui(new Ui::Auth)
@@ -11,6 +27,8 @@ Auth::Auth(QWidget *parent, client *m_cl)
 {
     ui->setupUi(this);
     ui->passwordLine->setEchoMode(QLineEdit::Password);
+    setup_font();
+
 }
 
 Auth::~Auth()

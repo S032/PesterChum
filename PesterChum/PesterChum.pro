@@ -17,7 +17,8 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     messagemodel.cpp \
-    messagethread.cpp
+    messagethread.cpp \
+    userchat.cpp
 
 HEADERS += \
     auth.h \
@@ -25,11 +26,13 @@ HEADERS += \
     coloredmessagedelegate.h \
     mainwindow.h \
     messagemodel.h \
-    messagethread.h
+    messagethread.h \
+    userchat.h
 
 FORMS += \
     auth.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    userchat.ui
 
 LIBS += -lws2_32
 
@@ -37,3 +40,11 @@ LIBS += -lws2_32
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    fonts/ChixaDemibold.ttf \
+    fonts/vcrosdmonorusbyd.ttf \
+    vcrosdmonorusbyd.ttf
+
+RESOURCES += \
+    fonts.qrc
