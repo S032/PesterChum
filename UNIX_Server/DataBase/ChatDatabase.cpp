@@ -57,6 +57,26 @@ bool ChatDatabase::check_username(user_t *user) {
     }
 }
 
+bool ChatDatabase::check_user_in_chattable(std::string sender_name, std::string recipient_name) {
+    try
+    {
+        sql::SQLString query = "SELECT US2.UserName FROM Chats AS CH";
+        query += " INNER JOIN User AS US1 ON CH.User1 = US1.ID";
+        query += " INNER JOIN User AS US2 ON CH.User2 = US2.ID";
+        query += " WHERE US1.UserName = '"+sender_name+"'";
+        query += " AND US2.UserName = '"+recipient_name+"'";
+        stmt = conn->createStatement();
+        rs= stmt->executeQuery(query);
+        if(!rs->next()) return false;
+        return true;
+    }
+    catch(sql::SQLException &e)
+    {
+        print_err(e);
+        return false;
+    }
+}
+
 bool ChatDatabase::reg_user(user_t *user) {
     try
     {
@@ -96,14 +116,14 @@ bool ChatDatabase::log_user(user_t *user) {
     }
 }
 
-bool ChatDatabase::getListOfUsers(std::string *answer, user_t *user) {
+bool ChatDatabase::getListOfUsers(std::string *answer, std::string username) {
     try
     {
         *(answer) = "/";
         sql::SQLString query = "SELECT US2.UserName FROM Chats AS CH";
         query += " INNER JOIN User AS US1 ON CH.User1 = US1.ID";
         query += " INNER JOIN User AS US2 ON CH.User2 = US2.ID";
-        query += " WHERE US1.UserName = '"+user->login+"'";
+        query += " WHERE US1.UserName = '"+username+"'";
         stmt = conn->createStatement();
         rs = stmt->executeQuery(query);
         while(rs->next()) {

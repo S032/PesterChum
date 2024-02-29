@@ -32,7 +32,8 @@ public:
     ChatDatabase();
     bool reg_user(user_t *user);
     bool log_user(user_t *user);
-    bool getListOfUsers(std::string *answer, user_t *user);
+    bool check_user_in_chattable(std::string sender_name, std::string recipient_name);
+    bool getListOfUsers(std::string *answer, std::string username);
 private:
     int find_next_id(sql::SQLString Table);
     bool check_username(user_t *user);

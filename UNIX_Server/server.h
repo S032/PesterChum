@@ -28,26 +28,7 @@
 /* Acronym */
 #define SA  struct sockaddr
 
-class QuerryHandler {
-private:
-    bool         res;
-    int          current_sock;
-    std::string  answer;
-    std::string  *auth_username;
-    std::string  query;
-    ChatDatabase *DB;
-    user_t       usr;
-    std::string  cmd;
-    size_t       l_pos, r_pos;
-public:
-    QuerryHandler(ChatDatabase *Q_DB);
-    bool make_querry(int cur_sock, std::string q_query, std::string *username);
-private:
-    std::string log_querry();
-    std::string reg_querry();
-    std::string sendto_querry();
-    std::string giveListOfUser();
-};
+class QuerryHandler;
 
 class server
 {
@@ -58,7 +39,7 @@ private:
     int                maxfd, listenfd, connfd;
     int                sockcount, client[FD_SETSIZE];
     std::map<int, std::string> clients;
-    std::vector<int> sockToDelete; 
+    std::vector<int>   sockToDelete; 
     ssize_t            n;
     fd_set             readset, allset;
     char               buf[MAXLINE];
@@ -69,13 +50,34 @@ public:
 public:
     void start();
     void stop();
+    void send_to(int currentsockfd, std::string recipient_name, std::string message);
 private:
     void exit_err(const char*);
     void init();
     void recieve(int, std::string*);
     void proccess();
-    void Send();
 };
 
+class QuerryHandler {
+private:
+    bool         res;
+    int          current_sock;
+    std::string  answer;
+    std::string  *auth_username;
+    std::string  query;
+    ChatDatabase *DB;
+    server       *SV;
+    user_t       usr;
+    std::string  cmd;
+    size_t       l_pos, r_pos;
+public:
+    QuerryHandler(ChatDatabase *Q_DB, server *Q_SV);
+    bool make_querry(int cur_sock, std::string q_query, std::string *username);
+private:
+    std::string log_querry();
+    std::string reg_querry();
+    std::string sendto_querry();
+    std::string giveListOfUser();
+};
 
 #endif

@@ -5,7 +5,10 @@ server::server() : clilen{sizeof(cliaddr)}
     FD_ZERO(&allset);
 }
 
-QuerryHandler::QuerryHandler(ChatDatabase *Q_DB) : DB{Q_DB}{};
+QuerryHandler::QuerryHandler(ChatDatabase *Q_DB, server *Q_SV)
+    :
+    DB(Q_DB),
+    SV(Q_SV){};
 
 void server::exit_err(const char* err_text) {
     perror(err_text);
@@ -28,13 +31,12 @@ void server::init() {
     printf("Success\n");
 
     DB = new ChatDatabase;
-    querry = new QuerryHandler(DB);
+    querry = new QuerryHandler(DB, this);
 
     printf("Server started on %d\n", SERV_PORT);
 }
 
 std::string QuerryHandler::log_querry() {
-    answer = "/f";
     l_pos = r_pos + 1;
     if ((r_pos = query.find('/', l_pos)) == std::string::npos) 
         return answer;
@@ -45,8 +47,7 @@ std::string QuerryHandler::log_querry() {
     return answer;
 }
 
-std::string QuerryHandler::reg_querry() { // что то не так
-    answer = "/f";
+std::string QuerryHandler::reg_querry() {
     l_pos = r_pos + 1;
     if ((r_pos = query.find('/', l_pos)) == std::string::npos)
         return answer;
@@ -58,18 +59,38 @@ std::string QuerryHandler::reg_querry() { // что то не так
 }
 
 std::string QuerryHandler::giveListOfUser() {
-    answer = "/f";
-    DB->getListOfUsers(&answer, &usr); 
+    DB->getListOfUsers(&answer, *(auth_username)); 
     return answer;
 }
 
 std::string QuerryHandler::sendto_querry() {
-    answer = "f";
-    /*/sendto/from_whom/to_whom/message*/
+    std::string recipient;
+    std::string message = "";
+    l_pos = r_pos + 1;
+    if (*(auth_username) == "") return answer;
+    //getting username
+    if ((r_pos = query.find('/', l_pos)) == std::string::npos)
+        return answer;
+    recipient = {query.begin() + l_pos, query.begin() + r_pos};
+    //getting message
+    l_pos = r_pos + 1;
+    message = {query.begin() + l_pos, query.end()};
+    message = *(auth_username) + ": " + message;
+    //sending
+    if (!DB->check_user_in_chattable(*(auth_username), recipient)) return answer;
+    answer = "/s";
+    SV->send_to(current_sock, recipient, message);
     return answer;
 }
 
 bool QuerryHandler::make_querry(int cur_sock, std::string q_query, std::string *username) {
+    /* 
+    /reg/login/password
+    /log/login/password
+    /sendto/to_whom/message
+    /getlist/
+    */
+    answer = "/f";
     auth_username = username;
     r_pos = l_pos = 0;
     query = q_query;
@@ -85,7 +106,7 @@ bool QuerryHandler::make_querry(int cur_sock, std::string q_query, std::string *
         log_querry();
     }
     else if (cmd == "sendto") {
-        std::cout << "it's send\n";
+        sendto_querry();
     }
     else if (cmd == "getlist") {
         giveListOfUser();
@@ -96,6 +117,13 @@ bool QuerryHandler::make_querry(int cur_sock, std::string q_query, std::string *
     std::cout << answer << std::endl;
     send(cur_sock, answer.c_str(), answer.size(), 0);
     return true;
+}
+
+void server::send_to(int currentsockfd, std::string recipient_name, std::string message) {
+    for (const auto& [sock, username] : clients) {
+        if (username == recipient_name)
+            send(sock, message.c_str(), message.size(), 0);
+        }
 }
 
 void server::recieve(int currentsockfd, std::string *username) {
