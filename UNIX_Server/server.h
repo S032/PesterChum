@@ -78,6 +78,10 @@ private:
     std::string reg_querry();
     std::string sendto_querry();
     std::string giveListOfUser();
+    std::string giveListOfIcReq();
+    std::string giveListOfOgReq();
+    std::string sendreq();
+    std::string reqanswer();
 };
 
 #endif

@@ -63,6 +63,16 @@ std::string QuerryHandler::giveListOfUser() {
     return answer;
 }
 
+std::string QuerryHandler::giveListOfIcReq() {
+    DB->getListOfIcReq(&answer, *(auth_username)); 
+    return answer;
+}
+
+std::string QuerryHandler::giveListOfOgReq() {
+    DB->getListOfOgReq(&answer, *(auth_username)); 
+    return answer;
+}
+
 std::string QuerryHandler::sendto_querry() {
     std::string recipient;
     std::string message = "";
@@ -83,12 +93,63 @@ std::string QuerryHandler::sendto_querry() {
     return answer;
 }
 
+std::string QuerryHandler::sendreq() {
+    std::string recipient;
+    l_pos = r_pos + 1;
+    //getting username
+    recipient = {query.begin() + l_pos, query.end()};
+    //trying add req in database
+    if(DB->addRequest(*(auth_username), recipient, &answer)) {
+        SV->send_to(current_sock, recipient, "/newreq/");
+    }
+    return answer;
+}
+
+std::string QuerryHandler::reqanswer() {
+    std::string requester, req_answer;
+    l_pos = r_pos + 1;
+    //getting requester name
+    if ((r_pos = query.find('/', l_pos)) == std::string::npos)
+        return answer;
+    requester = {query.begin() + l_pos, query.begin() + r_pos};
+    l_pos = r_pos + 1;
+    req_answer = {query.begin() + l_pos, query.end()};
+    if (req_answer == "accept") {
+        if (DB->delRequest(requester, *(auth_username), &answer)) {
+            if (DB->makeChat(*(auth_username), requester)) {
+                SV->send_to(current_sock, requester
+                , "/reqanswer/" + *(auth_username) + "/accept");
+            }
+            else {
+                SV->send_to(current_sock, requester
+                , "/reqanswer/" + requester + "/notexist");
+            }
+        }        
+    }
+    else if (req_answer == "denied") {
+        if (DB->delRequest(requester, *(auth_username), &answer)) {
+            SV->send_to(current_sock, requester
+            , "/reqanswer/" + *(auth_username) + "/denied");
+        }
+    }
+    else {
+        return answer;
+    }
+
+    std::cout << "requester: " << requester << std::endl;
+    std::cout << "req answer: " << req_answer << std::endl;
+    return answer;
+}
+
 bool QuerryHandler::make_querry(int cur_sock, std::string q_query, std::string *username) {
     /* 
-    /reg/login/password
-    /log/login/password
-    /sendto/to_whom/message
-    /getlist/
+    /reg/login/password - reg new acc
+    /log/login/password - log in acc
+    /sendto/to_whom/message - send message to user
+    /sendreq/to_whom - send req to user
+    /getlist/ - get list of friends
+    /getreq/ - get list of requests
+    /reqanswer/to_whom/(accept or denied) - answer to request
     */
     answer = "/f";
     auth_username = username;
@@ -105,11 +166,26 @@ bool QuerryHandler::make_querry(int cur_sock, std::string q_query, std::string *
     else if (cmd == "log") {
         log_querry();
     }
+    else if (*(auth_username) == "") {
+        answer = "you have no right for this...";
+    }
     else if (cmd == "sendto") {
         sendto_querry();
     }
     else if (cmd == "getlist") {
         giveListOfUser();
+    }
+    else if (cmd == "geticreq") {
+        giveListOfIcReq();
+    }
+    else if (cmd == "getogreq") {
+        giveListOfOgReq();
+    }
+    else if (cmd == "sendreq") {
+        sendreq();
+    }
+    else if (cmd == "reqanswer") {
+        reqanswer();
     }
     else {
         std::cout << "fuck\n";

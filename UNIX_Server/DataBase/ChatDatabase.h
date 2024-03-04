@@ -34,7 +34,13 @@ public:
     bool log_user(user_t *user);
     bool check_user_in_chattable(std::string sender_name, std::string recipient_name);
     bool getListOfUsers(std::string *answer, std::string username);
+    bool getListOfIcReq(std::string *answer, std::string username);
+    bool getListOfOgReq(std::string *answer, std::string username);
+    bool addRequest(std::string sender_name, std::string recipient_name, std::string *answer);
+    bool delRequest(std::string requester_name, std::string recipient_name, std::string *answer);
+    bool makeChat(std::string user1, std::string user2);
 private:
+    int UsernameToInt(std::string username);
     int find_next_id(sql::SQLString Table);
     bool check_username(user_t *user);
     void print_err(sql::SQLException e);
