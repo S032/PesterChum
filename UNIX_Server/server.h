@@ -82,6 +82,7 @@ private:
     std::string giveListOfOgReq();
     std::string sendreq();
     std::string reqanswer();
+    std::string deleteFriend();
 };
 
 #endif

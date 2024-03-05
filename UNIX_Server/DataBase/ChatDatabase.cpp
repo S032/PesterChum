@@ -278,3 +278,24 @@ bool ChatDatabase::makeChat(std::string user1, std::string user2) {
         return false;
     }
 }
+
+bool ChatDatabase::delChat(std::string sender_name, std::string friend_name) {
+        try
+    {
+        std::string sender_id = std::to_string(UsernameToInt(sender_name));
+        std::string friend_id = std::to_string(UsernameToInt(friend_name));
+        if (friend_id == "-1") return false;
+        sql::SQLString query = "DELETE FROM Chats WHERE User1 = "+sender_id+" AND User2 = "+friend_id;
+        stmt = conn->createStatement();
+        stmt->execute(query);
+        query = "DELETE FROM Chats WHERE User2 = "+sender_id+" AND User1 = "+friend_id;
+        stmt = conn->createStatement();
+        stmt->execute(query);
+        return true;
+    }
+    catch(sql::SQLException &e)
+    {
+        print_err(e);
+        return false;
+    }
+}

@@ -8,6 +8,7 @@
 7 - /getogreq/ - get list of outgoing requests
 8 - /reqanswer/to_whom/answer(accept or denied)
     - answer to request
+9 - /delfriend/frd_name - del friend
 #Answers for client:
 1 - /f - something went wrong
 2 - /s - something went success
@@ -19,4 +20,5 @@
                         exist - request already exists or user is
                         already your friend;
                         noexist - user isn't exist;
+8 - /delfriend/friend_name - frd've deleted you
 

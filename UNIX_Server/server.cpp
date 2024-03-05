@@ -141,6 +141,18 @@ std::string QuerryHandler::reqanswer() {
     return answer;
 }
 
+std::string QuerryHandler::deleteFriend() {
+    std::string friend_name;
+    l_pos = r_pos + 1;
+    //getting username
+    friend_name = {query.begin() + l_pos, query.end()};
+    if (DB->delChat(*(auth_username), friend_name)) {
+        SV->send_to(current_sock, friend_name , "/delfriend/"+*(auth_username));
+        answer = "/s";
+    }
+    return answer;
+}
+
 bool QuerryHandler::make_querry(int cur_sock, std::string q_query, std::string *username) {
     /* 
     /reg/login/password - reg new acc
@@ -186,6 +198,9 @@ bool QuerryHandler::make_querry(int cur_sock, std::string q_query, std::string *
     }
     else if (cmd == "reqanswer") {
         reqanswer();
+    }
+    else if (cmd == "delfriend") {
+        deleteFriend();
     }
     else {
         std::cout << "fuck\n";

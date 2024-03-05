@@ -39,6 +39,7 @@ public:
     bool addRequest(std::string sender_name, std::string recipient_name, std::string *answer);
     bool delRequest(std::string requester_name, std::string recipient_name, std::string *answer);
     bool makeChat(std::string user1, std::string user2);
+    bool delChat(std::string sender_name, std::string friend_name);
 private:
     int UsernameToInt(std::string username);
     int find_next_id(sql::SQLString Table);
