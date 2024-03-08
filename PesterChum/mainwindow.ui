@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>552</width>
-    <height>855</height>
+    <height>862</height>
    </rect>
   </property>
   <property name="font">
@@ -38,15 +38,34 @@
     </property>
     <property name="font">
      <font>
-      <family>Bahnschrift</family>
-      <pointsize>15</pointsize>
+      <family>MS Serif</family>
+      <pointsize>26</pointsize>
      </font>
+    </property>
+    <property name="cursor" stdset="0">
+     <cursorShape>ArrowCursor</cursorShape>
+    </property>
+    <property name="mouseTracking">
+     <bool>true</bool>
+    </property>
+    <property name="tabletTracking">
+     <bool>true</bool>
+    </property>
+    <property name="contextMenuPolicy">
+     <enum>Qt::DefaultContextMenu</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">QListView {
 	background-color: #000000;
 	color: #ffffff;
     border: 5px solid #fff700;
+}
+
+QListView::item:hover {
+	background-color: rgb(67, 67, 67);
+	color: #ffffff;
+    border: 5px solid #fff700;
+	cursor: pointer; 
 }
 </string>
     </property>
@@ -141,7 +160,7 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>140</x>
       <y>470</y>
       <width>221</width>
       <height>51</height>
@@ -213,7 +232,9 @@ border: 5px solid rgba(197, 139, 3, 1);
     <property name="styleSheet">
      <string notr="true">	background-color: #000000;
 	color: #ffffff;
-    border: 5px solid #fff700;</string>
+    border: 5px solid #fff700;
+    padding-top: 0px;
+    padding-left: 0px;</string>
     </property>
     <property name="text">
      <string>UserName</string>
@@ -247,14 +268,131 @@ border: 5px solid rgba(197, 139, 3, 1);
       <x>29</x>
       <y>669</y>
       <width>497</width>
-      <height>173</height>
+      <height>181</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
+     <item row="2" column="0">
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Serif</family>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+background-color: #fff700;
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+text-align: left;
+left; padding-left: 0px;
+}
+
+QPushButton:hover {
+background-color: rgb(244, 255, 39);
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+text-align: left;
+left; padding-left: 0px;
+}</string>
+       </property>
+       <property name="text">
+        <string>ЗАДОРНОЕ</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QPushButton" name="pushButton_6">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Serif</family>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+background-color: #fff700;
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+text-align: left;
+left; padding-left: 0px;
+}
+
+QPushButton:hover {
+background-color: rgb(244, 255, 39);
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+text-align: left;
+left; padding-left: 0px;
+}</string>
+       </property>
+       <property name="text">
+        <string>КОРЕШОВОЕ</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="pushButton_7">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Serif</family>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+background-color: #fff700;
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+text-align: left;
+left; padding-left: 0px;
+}
+
+QPushButton:hover {
+background-color: rgb(244, 255, 39);
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+text-align: left;
+left; padding-left: 0px;
+}</string>
+       </property>
+       <property name="text">
+        <string>БОДРОЕ</string>
+       </property>
+      </widget>
+     </item>
      <item row="2" column="1">
       <widget class="QPushButton" name="pushButton_3">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -273,12 +411,16 @@ border: 5px solid rgba(197, 139, 3, 1);
 background-color: rgb(255, 0, 0);
 color: rgb(0, 0, 0);
 border: 5px solid rgba(197, 139, 3, 1);
+text-align: left;
+left; padding-left: 0px;
 }
 
 QPushButton:hover {
 background-color: rgb(255, 65, 17);
 color: rgb(0, 0, 0);
 border: 5px solid rgba(197, 139, 3, 1);
+text-align: left;
+left; padding-left: 0px;
 }</string>
        </property>
        <property name="text">
@@ -286,115 +428,10 @@ border: 5px solid rgba(197, 139, 3, 1);
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QPushButton" name="pushButton_7">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="font">
-        <font>
-         <family>MS Serif</family>
-         <pointsize>20</pointsize>
-        </font>
-       </property>
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-background-color: #fff700;
-color: rgb(0, 0, 0);
-border: 5px solid rgba(197, 139, 3, 1);
-}
-
-QPushButton:hover {
-background-color: rgb(244, 255, 39);
-color: rgb(0, 0, 0);
-border: 5px solid rgba(197, 139, 3, 1);
-}</string>
-       </property>
-       <property name="text">
-        <string>БОДРОЕ</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QPushButton" name="pushButton_4">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="font">
-        <font>
-         <family>MS Serif</family>
-         <pointsize>20</pointsize>
-        </font>
-       </property>
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-background-color: #fff700;
-color: rgb(0, 0, 0);
-border: 5px solid rgba(197, 139, 3, 1);
-}
-
-QPushButton:hover {
-background-color: rgb(244, 255, 39);
-color: rgb(0, 0, 0);
-border: 5px solid rgba(197, 139, 3, 1);
-}</string>
-       </property>
-       <property name="text">
-        <string>ЭНЕРГИЧНОЕ</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QPushButton" name="pushButton_2">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="font">
-        <font>
-         <family>MS Serif</family>
-         <pointsize>20</pointsize>
-        </font>
-       </property>
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-background-color: #fff700;
-color: rgb(0, 0, 0);
-border: 5px solid rgba(197, 139, 3, 1);
-}
-
-QPushButton:hover {
-background-color: rgb(244, 255, 39);
-color: rgb(0, 0, 0);
-border: 5px solid rgba(197, 139, 3, 1);
-}</string>
-       </property>
-       <property name="text">
-        <string>ЗАДОРНОЕ</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0">
       <widget class="QPushButton" name="pushButton_5">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -413,12 +450,16 @@ border: 5px solid rgba(197, 139, 3, 1);
 background-color: #fff700;
 color: rgb(0, 0, 0);
 border: 5px solid rgba(197, 139, 3, 1);
+text-align: left;
+left; padding-left: 0px;
 }
 
 QPushButton:hover {
 background-color: rgb(244, 255, 39);
 color: rgb(0, 0, 0);
 border: 5px solid rgba(197, 139, 3, 1);
+text-align: left;
+left; padding-left: 0px;
 }</string>
        </property>
        <property name="text">
@@ -426,10 +467,10 @@ border: 5px solid rgba(197, 139, 3, 1);
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
-      <widget class="QPushButton" name="pushButton_6">
+     <item row="1" column="1">
+      <widget class="QPushButton" name="pushButton_4">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -448,6 +489,39 @@ border: 5px solid rgba(197, 139, 3, 1);
 background-color: #fff700;
 color: rgb(0, 0, 0);
 border: 5px solid rgba(197, 139, 3, 1);
+text-align: left;
+left; padding-left: 0px;
+}
+
+QPushButton:hover {
+background-color: rgb(244, 255, 39);
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+text-align: left;
+left; padding-left: 0px;
+}</string>
+       </property>
+       <property name="text">
+        <string>ЭНЕРГИЧНОЕ</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QPushButton" name="friends_button">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>470</y>
+      <width>51</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+background-color: #fff700;
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
 }
 
 QPushButton:hover {
@@ -455,13 +529,13 @@ background-color: rgb(244, 255, 39);
 color: rgb(0, 0, 0);
 border: 5px solid rgba(197, 139, 3, 1);
 }</string>
-       </property>
-       <property name="text">
-        <string>КОРЕШОВОЕ</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset theme="accessories-character-map"/>
+    </property>
    </widget>
   </widget>
  </widget>

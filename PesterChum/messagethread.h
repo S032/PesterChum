@@ -6,7 +6,7 @@
 #include <QMainWindow>
 #include <string>
 #include "client.h"
-#include "messagemodel.h"
+#include "customItemModel.h"
 
 class MessageReader : public QObject
 {
@@ -16,7 +16,8 @@ public:
 public slots:
     void doWork(client *cl);
 signals:
-    void resultReady(std::string message);
+    void itsMessage(std::string message);
+    void itsAnswer(std::string message);
     void makeFatalError(QString errortext);
 };
 
@@ -28,13 +29,24 @@ private:
     MessageReader *reader;
     client *cl;
     MessageModel *model;
+    size_t r_pos, l_pos;
 public:
     ThreadController(client *r_cl);
     ~ThreadController();
+private:
+    void requestAnswerHandler(std::string answer);
 public slots:
-    void handleResults(std::string message);
+    void messageHandler(std::string message);
+    void answerHandler(std::string answer);
     void throwFatalErrorOccuried(QString errortext);
 signals:
+    void messageReady(std::string sender_name, std::string message);
+    void listOfUsersReady(std::string userlist);
+    void listOfIcReqReady(std::string icreqlist);
+    void listOfOgReqReady(std::string ogreqlist);
+    void getUsers();
+    void getIcRequests();
+    void getOgRequests();
     void startRead(client *cl);
     void throwFatalError(QString errortext);
 };

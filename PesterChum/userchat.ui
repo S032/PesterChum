@@ -247,6 +247,9 @@
     border: 5px solid rgba(197, 139, 3, 1);
 }</string>
    </property>
+   <property name="verticalScrollMode">
+    <enum>QAbstractItemView::ScrollPerPixel</enum>
+   </property>
   </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">

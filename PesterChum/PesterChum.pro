@@ -13,24 +13,27 @@ CONFIG += thread
 SOURCES += \
     auth.cpp \
     client.cpp \
-    coloredmessagedelegate.cpp \
+    customItemModel.cpp \
+    friendrequset.cpp \
+    itemdelegate.cpp \
     main.cpp \
     mainwindow.cpp \
-    messagemodel.cpp \
     messagethread.cpp \
     userchat.cpp
 
 HEADERS += \
     auth.h \
     client.h \
-    coloredmessagedelegate.h \
+    customItemModel.h \
+    friendrequset.h \
+    itemdelegate.h \
     mainwindow.h \
-    messagemodel.h \
     messagethread.h \
     userchat.h
 
 FORMS += \
     auth.ui \
+    friendrequset.ui \
     mainwindow.ui \
     userchat.ui
 
@@ -44,7 +47,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES += \
     fonts/ChixaDemibold.ttf \
     fonts/vcrosdmonorusbyd.ttf \
+    images/friends.png \
     vcrosdmonorusbyd.ttf
 
 RESOURCES += \
-    fonts.qrc
+    fonts.qrc \
+    images.qrc

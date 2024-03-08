@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>friendrequset</class>
+ <widget class="QDialog" name="friendrequset">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>692</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>новые знакомства...</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">    background-color: rgba(255, 181, 0, 1);
+    color: #ffffff;
+    padding: 5px 10px;
+    border-radius: 3px;
+    border-radius: 0;</string>
+  </property>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>10</y>
+     <width>381</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Serif</family>
+     <pointsize>26</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0, 0, 0);</string>
+   </property>
+   <property name="text">
+    <string>ЗАПРОСЫВКОРЕША:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>400</y>
+     <width>331</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Serif</family>
+     <pointsize>26</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0, 0, 0);</string>
+   </property>
+   <property name="text">
+    <string>ВАШИЗАПРОСЫ:</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>60</y>
+     <width>591</width>
+     <height>331</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QListView" name="incoming_req">
+      <property name="font">
+       <font>
+        <family>MS Serif</family>
+        <pointsize>16</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QListView {
+	background-color: #000000;
+	color: #ffffff;
+    border: 5px solid #fff700;
+}
+
+QListView::item:hover {
+	background-color: rgb(67, 67, 67);
+	color: #ffffff;
+    border: 5px solid #fff700;
+	cursor: pointer; 
+}
+</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="font">
+         <font>
+          <family>MS Serif</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+background-color: #fff700;
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}
+
+QPushButton:hover {
+background-color: rgb(244, 255, 39);
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}</string>
+        </property>
+        <property name="text">
+         <string>ПРИНЯТЬ</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="font">
+         <font>
+          <family>MS Serif</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+background-color: #fff700;
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}
+
+QPushButton:hover {
+background-color: rgb(244, 255, 39);
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}</string>
+        </property>
+        <property name="text">
+         <string>ОТКЛОНИТЬ</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>450</y>
+     <width>591</width>
+     <height>331</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QListView" name="outgoing_req">
+      <property name="font">
+       <font>
+        <family>MS Serif</family>
+        <pointsize>16</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QListView {
+	background-color: #000000;
+	color: #ffffff;
+    border: 5px solid #fff700;
+}
+
+QListView::item:hover {
+	background-color: rgb(67, 67, 67);
+	color: #ffffff;
+    border: 5px solid #fff700;
+	cursor: pointer; 
+}
+</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLineEdit" name="lineEdit">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>39</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="whatsThis">
+         <string/>
+        </property>
+        <property name="accessibleName">
+         <string/>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: #ffffff;
+color: #000000;
+border: 5px solid rgba(197, 139, 3, 1);</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string>Введите корешник вашего друга</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_3">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>5</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>MS Serif</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+background-color: #fff700;
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}
+
+QPushButton:hover {
+background-color: rgb(244, 255, 39);
+color: rgb(0, 0, 0);
+border: 5px solid rgba(197, 139, 3, 1);
+}</string>
+        </property>
+        <property name="text">
+         <string>ОТПРАВИТЬ</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

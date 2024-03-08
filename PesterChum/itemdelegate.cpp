@@ -1,9 +1,11 @@
-#include "coloredmessagedelegate.h"
+#include "itemdelegate.h"
 
-ColoredMessageDelegate::ColoredMessageDelegate(QObject *parent, QListView *m_listView)
+ColoredMessageDelegate::ColoredMessageDelegate(QObject *parent, QListView *m_listView, QString m_fontFamily, int m_fontSize)
     :
     QStyledItemDelegate(parent),
-    listView(m_listView)
+    listView(m_listView),
+    fontFamily(m_fontFamily),
+    fontSize(m_fontSize)
 {}
 
 QSize ColoredMessageDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -15,7 +17,7 @@ QSize ColoredMessageDelegate::sizeHint(const QStyleOptionViewItem &option, const
     text = splitUnitText(text, option);
 
     // creating object for size calculation
-    QFont font("MS Serif", 20);
+    QFont font(fontFamily, 23);
     QFontMetrics fm(font);
 
     // size caclulation
@@ -31,7 +33,7 @@ QString ColoredMessageDelegate::splitUnitText(QString unitText, const QStyleOpti
 {
     int listViewSizePx = listView->width() - 20;
     QString newText;
-    QFont font("MS Serif", 20);
+    QFont font(fontFamily, 23);
     QFontMetrics fm(font);
 
     int wordLength = 0;
@@ -69,3 +71,54 @@ void ColoredMessageDelegate::paint(QPainter *painter,
     painter->drawText(rect, text, textOption);
 
 }
+
+//////////////////////////////////////////////////////////////////////
+
+UserchatsDelegate::UserchatsDelegate(QObject *parent, QString m_fontFamily)
+    :
+    QStyledItemDelegate(parent),
+    fontFamily(m_fontFamily)
+{}
+
+/*
+QSize UserchatsDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    // getting data from index
+    QVariant data = index.data(Qt::DisplayRole);
+    QString text = data.toString();
+
+    // creating object for size calculation
+    QFont font(fontFamily, 40);
+    QFontMetrics fm(font);
+
+    // size caclulation
+    QSize size = fm.size(Qt::TextSingleLine, text);
+
+    size.setHeight(size.height());
+
+    return size;
+}
+*/
+
+void UserchatsDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    if (!index.isValid()) return;
+
+    QString username = index.data(Qt::DisplayRole).toString();
+    QRect rect = option.rect;
+    QStyleOptionViewItem opt = option;
+
+    bool isSelected = option.state & QStyle::State_Selected;
+    QColor background = isSelected ? Qt::gray : Qt::black;
+    painter->fillRect(opt.rect, background);
+    if (opt.state & QStyle::State_MouseOver) {
+        painter->fillRect(opt.rect, QColor(Qt::lightGray));
+    }
+
+    painter->save();
+    painter->drawText(rect, username);
+}
+
+
+
+

@@ -3,15 +3,12 @@
 
 void MainWindow::setup_listview()
 {
-    /*
-    ui->listView->setModel(model);
-    ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->listView->setSelectionMode(QAbstractItemView::NoSelection);
-    ui->listView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    ui->listView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    delegate = new ColoredMessageDelegate(ui->listView, ui->listView);
-    ui->listView->setItemDelegate(delegate);
-    */
+    ui->UserList->setModel(usermodel);
+    ui->UserList->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->UserList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->UserList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    delegate = new UserchatsDelegate(this);
+    ui->UserList->setItemDelegate(delegate);
 }
 
 void MainWindow::setup_font()
@@ -29,6 +26,7 @@ void MainWindow::setup_font()
     ui->MyUserName->setFont(pixelFont);
     ui->UserName->setFont(pixelFont);
     ui->Mood->setFont(pixelFont);
+    pixelFont.setPixelSize(35);
     ui->pushButton->setFont(pixelFont);
     ui->pushButton_2->setFont(pixelFont);
     ui->pushButton_3->setFont(pixelFont);
@@ -36,6 +34,37 @@ void MainWindow::setup_font()
     ui->pushButton_5->setFont(pixelFont);
     ui->pushButton_6->setFont(pixelFont);
     ui->pushButton_7->setFont(pixelFont);
+    pixelFont.setPixelSize(28);
+    ui->UserList->setFont(pixelFont);
+}
+
+void MainWindow::setup_images()
+{
+    friends_pic = new QPixmap("://images/friends_41x41.png");
+    friends_pic_alert = new QPixmap("://images/friends_alert_41x41.png");
+
+    QIcon ButtonIcon(*(friends_pic));
+    ui->friends_button->setIcon(ButtonIcon);
+    ui->friends_button->setIconSize(friends_pic->rect().size());
+    //Mood button
+    smile_pic = new QPixmap("://images/smile.png");
+    inactive_pic = new QPixmap("://images/inactive.png");
+    angry_pic = new QPixmap("://images/angry.png");
+
+    QIcon SmileIcon(*(smile_pic));
+    QIcon AngryIcon(*(angry_pic));
+    ui->pushButton_2->setIcon(SmileIcon);
+    ui->pushButton_2->setIconSize(smile_pic->rect().size());
+    ui->pushButton_3->setIcon(AngryIcon);
+    ui->pushButton_3->setIconSize(angry_pic->rect().size());
+    ui->pushButton_4->setIcon(SmileIcon);
+    ui->pushButton_4->setIconSize(smile_pic->rect().size());
+    ui->pushButton_5->setIcon(SmileIcon);
+    ui->pushButton_5->setIconSize(smile_pic->rect().size());
+    ui->pushButton_6->setIcon(SmileIcon);
+    ui->pushButton_6->setIconSize(smile_pic->rect().size());
+    ui->pushButton_7->setIcon(SmileIcon);
+    ui->pushButton_7->setIconSize(smile_pic->rect().size());
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -46,17 +75,19 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setup_font();
     cl = new client(this);
-    QObject::connect(cl, &client::throwFatalError, this, &MainWindow::proccesFatalError);
-    QObject::connect(cl, &client::throwError, this, &MainWindow::proccesError);
+    friendReq = new friendrequset(this, fontFamily);
     reg = new Auth(nullptr, cl);
     reg->show();
-    UserChat *usr;
-    usr = new UserChat(this);
-    //this->show();
+    QObject::connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::PesterClicked);
+    QObject::connect(ui->UserList, &QListView::clicked, this, [this](const QModelIndex &index){
+        ui->UserList->setCurrentIndex(index);
+    });
+    QObject::connect(cl, &client::throwFatalError, this, &MainWindow::proccesFatalError);
+    QObject::connect(cl, &client::throwError, this, &MainWindow::proccesError);
+    QObject::connect(friendReq, &friendrequset::sendRequest, this, &MainWindow::sendRequest);
+    QObject::connect(friendReq, &friendrequset::sendRequestAnswer, this, &MainWindow::sendRequestAnswer);
+    QObject::connect(reg, &Auth::sendUser, this, &MainWindow::start);
 
-    connect(reg, &Auth::sendUser, this, &MainWindow::start);
-    connect(this, &MainWindow::startChat, usr, &UserChat::startChat);
-    //emit startChat("виниловыйДемиург", nullptr, fontFamily);
 }
 
 MainWindow::~MainWindow()
@@ -79,20 +110,171 @@ void MainWindow::proccesError(QString error)
     QMessageBox::warning(this, "WARNING", error);
 }
 
-void MainWindow::startReadInThread(client *cl)
+void MainWindow::startReadInThread()
 {
     ReadThread = new ThreadController(cl);
     QObject::connect(ReadThread, &ThreadController::throwFatalError, this, &MainWindow::proccesFatalError);
+    QObject::connect(ReadThread, &ThreadController::messageReady, this, &MainWindow::sendMessageByUsername);
+    QObject::connect(ReadThread, &ThreadController::listOfUsersReady, this, &MainWindow::updateListOfUsers);
+    QObject::connect(ReadThread, &ThreadController::getUsers, this, &MainWindow::getUsers);
+    QObject::connect(ReadThread, &ThreadController::getIcRequests, this, &MainWindow::getIcRequests);
+    QObject::connect(ReadThread, &ThreadController::getOgRequests, this, &MainWindow::getOgRequests);
+    QObject::connect(ReadThread, &ThreadController::listOfIcReqReady, friendReq, &friendrequset::updateListOfIcReq);
+    QObject::connect(ReadThread, &ThreadController::listOfOgReqReady, friendReq, &friendrequset::updateListOfOgReq);
     ReadThread->emit startRead(cl);
+}
+
+void MainWindow::deleteFriend(const QPoint& pos, const QModelIndex index)
+{
+    QPoint globalPos = ui->UserList->mapToGlobal(pos);
+
+    QMenu menu;
+    menu.addAction("удалить");
+
+    QAction *selectedItem = menu.exec(globalPos);
+    if (selectedItem) {
+        //добавить окно спрашивающее уверены ли вы
+        std::string friend_name = index.data().toString().toStdString();
+        std::string query = "/delfriend/" + friend_name;
+        cl->writeMessage(query);
+        Sleep(100); // убрать
+        sendQuery("getlist");
+    }
+}
+
+void MainWindow::set_mood(std::string mood)
+{
+    if (mood == "smile") {
+        //ui->UserName->setPixmap(*(mood_pic));
+        //ui->UserName->setText("zzz");
+    }
+}
+
+void MainWindow::sendQuery(std::string query)
+{
+    query = "/" + query + "/";
+    cl->writeMessage(query);
+}
+
+void MainWindow::sendRequest(std::string name) {
+    name = "/sendreq/" + name;
+    cl->writeMessage(name);
+    sendQuery("getogreq");
+}
+
+void MainWindow::sendRequestAnswer(std::string name, std::string answer) {
+    name = "/reqanswer/" + name + "/" + answer;
+    cl->writeMessage(name);
+    emit getIcRequests();
+}
+
+void MainWindow::getUsers()
+{
+    sendQuery("getlist");
+}
+
+void MainWindow::getIcRequests()
+{
+    sendQuery("geticreq");
+    if(friendReq->isHidden()) {
+        QIcon ButtonIcon(*(friends_pic_alert));
+        ui->friends_button->setIcon(ButtonIcon);
+        ui->friends_button->setIconSize(friends_pic->rect().size());
+    }
+    Sleep(100); // убрать слипание покетоввававава ужас так делать ваще!!!!
+    sendQuery("getlist");
+}
+
+void MainWindow::getOgRequests()
+{
+    sendQuery("getogreq");
+    Sleep(100); // убрать слипание покетоввававава ужас так делать ваще!!!!
+    sendQuery("getlist");
 }
 
 void MainWindow::start(std::string S_user, client *auth_cl) {
     cl = auth_cl;
     auth_cl->giveNewParent(this);
-    startReadInThread(auth_cl);
     username = S_user;
+    usermodel = new UserchatModel(this);
+    usercontroller = new UserchatsController();
+    startReadInThread();
+    sendQuery("getlist");
+    Sleep(100); //боже за что...
+    sendQuery("geticreq");
+    Sleep(100); //убрать
+    sendQuery("getogreq");
     setup_listview();
-    ui->UserName->setText(username.c_str());
+    setup_images();
+    //emit set_mood("smile");
+    QString QUserName = username.c_str(); // сделать по члвчски
+    QString userlabel = "<img src=':/images/smile.png' style='vertical-align: middle;'> " + QUserName;
+    ui->UserName->setText(userlabel);
     this->show();
 }
+
+void MainWindow::sendMessageByUsername(std::string sender_name, std::string message)
+{
+    usercontroller->sendMessageToChat(sender_name, message);
+}
+
+void MainWindow::updateListOfUsers(std::string userlist)
+{
+    // /usr1/usr2/.../usrN/
+    ui->UserList->model()->removeRows(0, ui->UserList->model()->rowCount());
+    size_t l_pos, r_pos;
+    std::string recipient_name;
+    l_pos = 1;
+    if((r_pos = userlist.find("/", 1)) == std::string::npos) return;
+    while(r_pos != std::string::npos) {
+        recipient_name = {userlist.begin() + l_pos, userlist.begin() + r_pos};
+        usermodel->addUserchat(recipient_name.c_str());
+        UserChat *chat = new UserChat(this, recipient_name, username, cl, fontFamily);
+        usercontroller->addChat(recipient_name, chat);
+        l_pos = r_pos + 1;
+        r_pos = userlist.find("/", l_pos);
+    }
+}
+
+void MainWindow::PesterClicked()
+{
+    QModelIndexList selectedIndexes = ui->UserList->selectionModel()->selectedIndexes();
+    if (!selectedIndexes.isEmpty()) {
+        QModelIndex selectedIndex = selectedIndexes.first();
+        QVariant data = selectedIndex.data(Qt::DisplayRole);
+        QString text = data.toString();
+
+        usercontroller->openChat(text.toStdString());
+    }
+}
+
+
+void MainWindow::on_UserList_doubleClicked(const QModelIndex &index)
+{
+    QVariant data = index.data(Qt::DisplayRole);
+    QString text = data.toString();
+
+    usercontroller->openChat(text.toStdString());
+}
+
+void MainWindow::on_friends_button_clicked()
+{
+    QIcon ButtonIcon(*(friends_pic));
+    ui->friends_button->setIcon(ButtonIcon);
+    ui->friends_button->setIconSize(friends_pic->rect().size());
+    friendReq->show();
+}
+
+void MainWindow::contextMenuEvent(QContextMenuEvent *event)
+{
+    QPoint pos = event->pos();
+    QPoint itemPos = ui->UserList->viewport()->mapFrom(this, pos);
+    QModelIndex index = ui->UserList->indexAt(itemPos);
+    qDebug() << index.isValid();
+    if (index.isValid()) {
+        deleteFriend(itemPos, index);
+    }
+}
+
+
 

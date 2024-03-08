@@ -8,7 +8,8 @@ ThreadController::ThreadController(client *r_cl)
     reader->moveToThread(&readerThread);
     connect(&readerThread, &QThread::finished, reader, &QObject::deleteLater);
     connect(this, &ThreadController::startRead, reader, &MessageReader::doWork);
-    connect(reader, &MessageReader::resultReady, this, &ThreadController::handleResults);
+    connect(reader, &MessageReader::itsMessage, this, &ThreadController::messageHandler);
+    connect(reader, &MessageReader::itsAnswer, this, &ThreadController::answerHandler);
     connect(reader, &MessageReader::makeFatalError, this, &ThreadController::throwFatalErrorOccuried);
     readerThread.start();
 }
@@ -18,6 +19,35 @@ ThreadController::~ThreadController()
     readerThread.quit();
     readerThread.wait();
 }
+
+void ThreadController::requestAnswerHandler(std::string answer)
+{
+    l_pos = r_pos + 1;
+    r_pos = answer.find("/", l_pos);
+    std::string recipient_name = {answer.begin() + l_pos, answer.begin() + r_pos};
+    l_pos = r_pos + 1;
+    std::string answ = {answer.begin() + l_pos, answer.end()};
+    qDebug() << "rec_name: " << recipient_name;
+    qDebug() << "answ: " << answ;
+    if (answ == "accept") {
+
+    }
+    else if (answ == "denie") {
+
+    }
+    else if (answ == "exist") {
+
+    }
+    else if (answ == "notexist") {
+
+    }
+    else if (answ == "already") {
+
+    }
+    emit getOgRequests();
+}
+
+
 
 void MessageReader::doWork(client *cl)
 {
@@ -31,13 +61,54 @@ void MessageReader::doWork(client *cl)
         if(z == -1) {
             m_isRunning = false;
         }
-        emit resultReady(result);
+        qDebug() << "server answer: " <<result;
+        if (result[0] == '/') emit itsAnswer(result);
+        else emit itsMessage(result);
     }
 }
 
-void ThreadController::handleResults(std::string message)
+void ThreadController::messageHandler(std::string message)
 {
-    //model->addMessage(message.c_str(), Qt::red);
+    std::string sender = {message.begin(), message.begin() + message.find(":")};
+    emit messageReady(sender, message);
+}
+
+void ThreadController::answerHandler(std::string answer)
+{
+    if (answer == "/f") {
+
+    }
+    if (answer == "/s") return;
+    std::string cmd;
+    r_pos = l_pos = 0;
+    if((r_pos = answer.find('/', 1)) == std::string::npos) return;
+    cmd = {answer.begin() + 1, answer.begin() + r_pos};
+    qDebug() << "cmd: " << cmd;
+    if (cmd == "userlist") {
+        std::string userlist = {answer.begin() + r_pos, answer.end()};
+        emit listOfUsersReady(userlist);
+    }
+    else if (cmd == "icreqlist") {
+        std::string icreqlist = {answer.begin() + r_pos, answer.end()};
+        emit listOfIcReqReady(icreqlist);
+    }
+    else if (cmd == "ogreqlist") {
+        std::string ogreqlist = {answer.begin() + r_pos, answer.end()};
+        emit listOfOgReqReady(ogreqlist);
+    }
+    else if (cmd == "newreq") {
+        emit getIcRequests();
+    }
+    else if (cmd == "reqanswer") {
+        requestAnswerHandler(answer);
+    }
+    else if (cmd == "delfriend") {
+        std::string notfriend_name; // добавить уведомление об удалении из др
+        emit getUsers();
+    }
+    else {
+        qDebug() << "fuck";
+    }
 }
 
 void ThreadController::throwFatalErrorOccuried(QString errortext)

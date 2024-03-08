@@ -18,6 +18,8 @@ void Auth::setup_font()
     ui->label_2->setFont(pixelFont);
     ui->SignUpButton->setFont(pixelFont);
     ui->SignInButton->setFont(pixelFont);
+    pixelFont.setPixelSize(38);
+    ui->userLine->setFont(pixelFont);
 }
 
 Auth::Auth(QWidget *parent, client *m_cl)
@@ -28,7 +30,6 @@ Auth::Auth(QWidget *parent, client *m_cl)
     ui->setupUi(this);
     ui->passwordLine->setEchoMode(QLineEdit::Password);
     setup_font();
-
 }
 
 Auth::~Auth()

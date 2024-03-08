@@ -10,6 +10,7 @@ client::client(QWidget *parent)
     servPort(34543),
     servIp("192.168.1.103")
     //84.201.157.25:26098 - real server
+    //192.168.1.103:34543 - local server
 {
     buffer.reserve(MAXLINE);
     Parent = parent;
@@ -58,8 +59,8 @@ int client::reg_user(std::string username, std::string password) {
     std::vector<char> buff(MAXLINE);
     recv(clientSock, buff.data(), buff.size(), 0);
     std::string answer(buff.data());
-    if (answer == "/f") return -2;
-    return 0;
+    if (answer == "/s") return 0;
+    return -2;
 }
 
 int client::log_user(std::string username, std::string password) {
