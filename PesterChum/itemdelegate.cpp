@@ -80,31 +80,22 @@ UserchatsDelegate::UserchatsDelegate(QObject *parent, QString m_fontFamily)
     fontFamily(m_fontFamily)
 {}
 
-/*
+
 QSize UserchatsDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    // getting data from index
-    QVariant data = index.data(Qt::DisplayRole);
-    QString text = data.toString();
-
-    // creating object for size calculation
-    QFont font(fontFamily, 40);
-    QFontMetrics fm(font);
-
-    // size caclulation
-    QSize size = fm.size(Qt::TextSingleLine, text);
-
-    size.setHeight(size.height());
-
+    QSize size = QStyledItemDelegate::sizeHint(option, index);
+    size.setHeight(size.height() + 10); // Увеличиваем высоту на 20 пикселей сверху и снизу
     return size;
 }
-*/
+
 
 void UserchatsDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     if (!index.isValid()) return;
 
     QString username = index.data(Qt::DisplayRole).toString();
+    QString pic_path = index.data(Qt::UserRole).toString();
+    QString alert_path = index.data(Qt::UserRole + 1).toString();
     QRect rect = option.rect;
     QStyleOptionViewItem opt = option;
 
@@ -115,8 +106,32 @@ void UserchatsDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
         painter->fillRect(opt.rect, QColor(Qt::lightGray));
     }
 
+    int picWidth = 28;
+    int picHeight = 23;
+    QPixmap pic(pic_path);
+    pic = pic.scaled(picWidth, picHeight, Qt::KeepAspectRatio);
+    QRect picRect = QRect(option.rect.left() + 5, option.rect.top() + 2 + 5, picWidth, picHeight);
+    painter->drawPixmap(picRect, pic, pic.rect());
+
+    int picWidth2 = 27;
+    int picHeight2 = 27;
+    QPixmap pic2(alert_path);
+    pic2 = pic2.scaled(picWidth2, picHeight2, Qt::KeepAspectRatio);
+
+    // Вычисляем координаты верхнего левого угла для изображения
+    int picX = option.rect.right() - picWidth2 - 5; // X координата с отступом 5 пикселей от левого края айтема
+    int picY = option.rect.top() + 6;
+
+    // Создаем прямоугольник для изображения
+    QRect picRect2(picX, picY, picWidth2, picHeight2);
+
+    // Рисуем изображение
+    painter->drawPixmap(picRect2, pic2);
+
     painter->save();
+    rect = option.rect.adjusted(10 + picWidth, 5, 0, 0);
     painter->drawText(rect, username);
+
 }
 
 

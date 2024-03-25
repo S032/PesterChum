@@ -22,10 +22,11 @@ void friendrequset::setup_ogReqList()
 void friendrequset::set_font()
 {
     QFont pixelFont(fontFamily);
-    pixelFont.setPixelSize(40);
+    pixelFont.setPixelSize(35);
     pixelFont.setBold(true);
     ui->label_2->setFont(pixelFont);
     ui->label->setFont(pixelFont);
+    pixelFont.setPixelSize(40);
     ui->pushButton->setFont(pixelFont);
     ui->pushButton_2->setFont(pixelFont);
     ui->pushButton_3->setFont(pixelFont);

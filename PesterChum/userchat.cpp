@@ -6,7 +6,7 @@ UserChat::UserChat(QWidget *parent, std::string r_name, std::string s_name, clie
     , ui(new Ui::UserChat)
 {
     ui->setupUi(this);
-    setWindowFlags(windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+    //setWindowFlags(windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
     cl = auth_cl;
     fontFamily = m_fontFamily;
     model = new MessageModel(this, ui);
@@ -26,7 +26,7 @@ UserChat::~UserChat()
 void UserChat::setup_listview()
 {
     ui->listView->setModel(model);
-    ui->listView->verticalScrollBar()->setSingleStep(20);;
+    ui->listView->verticalScrollBar()->setSingleStep(20);
     ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->listView->setSelectionMode(QAbstractItemView::NoSelection);
     ui->listView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -54,6 +54,18 @@ void UserChat::writeSenderMessage(std::string message)
     model->addMessage(message.c_str(), Qt::red);
 }
 
+void UserChat::writeLeftMessage()
+{
+    std::string message = recipient_name + " вышел в ofline";
+    model->addMessage(message.c_str(), Qt::gray);
+}
+
+void UserChat::writeJoinMessage()
+{
+    std::string message = recipient_name + " снова online";
+    model->addMessage(message.c_str(), Qt::gray);
+}
+
 void UserChat::throw_message() {
     std::string message = ui->lineEdit->text().toStdString();
     std::string messageToSend = message;
@@ -74,6 +86,11 @@ void UserChat::on_lineEdit_returnPressed() {
     throw_message();
 }
 ///////////////////////////////////////////////////////
+bool UserchatsController::chatIsOpen(std::string login)
+{
+    return !userchats[login]->isHidden();
+}
+
 void UserchatsController::addChat(std::string login, UserChat *chat)
 {
     userchats.insert({login, chat});
@@ -87,4 +104,14 @@ void UserchatsController::openChat(std::string login)
 void UserchatsController::sendMessageToChat(std::string login, std::string message)
 {
     userchats[login]->writeSenderMessage(message);
+}
+
+void UserchatsController::sendLeftMessage(std::string login)
+{
+    userchats[login]->writeLeftMessage();
+}
+
+void UserchatsController::sendJoinMessage(std::string login)
+{
+    userchats[login]->writeJoinMessage();
 }

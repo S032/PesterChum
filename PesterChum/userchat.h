@@ -27,6 +27,8 @@ public:
                       std::string s_user = nullptr, client *auth_cl = nullptr, QString m_fontFamily = nullptr);
     ~UserChat();
     void writeSenderMessage(std::string message);
+    void writeLeftMessage();
+    void writeJoinMessage();
 private:
     void setup_listview();
     void setup_font();
@@ -50,10 +52,13 @@ private:
     std::map<std::string, UserChat*> userchats;
     std::string username;
 public:
+    bool chatIsOpen(std::string login);
     void addChat(std::string login, UserChat *chat);
     void deleteChat(std::string login);
     void openChat(std::string login);
     void sendMessageToChat(std::string login, std::string message);
+    void sendLeftMessage(std::string login);
+    void sendJoinMessage(std::string login);
 };
 
 #endif // USERCHAT_H

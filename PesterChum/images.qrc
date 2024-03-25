@@ -2,8 +2,13 @@
     <qresource prefix="/">
         <file>images/friends_41x41.png</file>
         <file>images/friends_alert_41x41.png</file>
-        <file>images/smile.png</file>
-        <file>images/angry.png</file>
-        <file>images/inactive.png</file>
+        <file>images/inactive28x22.png</file>
+        <file>images/inactive43x43.png</file>
+        <file>images/smile_28x23.png</file>
+        <file>images/smile_43x43.png</file>
+        <file>images/angry_43x43.png</file>
+        <file>images/new_message_alert.png</file>
+        <file>images/angry_28x23.png</file>
+        <file>images/PesterChums.png</file>
     </qresource>
 </RCC>

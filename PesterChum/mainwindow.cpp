@@ -5,6 +5,7 @@ void MainWindow::setup_listview()
 {
     ui->UserList->setModel(usermodel);
     ui->UserList->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->UserList->verticalScrollBar()->setSingleStep(8);
     ui->UserList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->UserList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     delegate = new UserchatsDelegate(this);
@@ -20,8 +21,9 @@ void MainWindow::setup_font()
     pixelFont.setBold(true);
 
     ui->label->setFont(pixelFont);
+    pixelFont.setPixelSize(39);
     ui->label_2->setFont(pixelFont);
-    pixelFont.setPixelSize(40);
+    pixelFont.setPixelSize(35);
     ui->label_3->setFont(pixelFont);
     ui->MyUserName->setFont(pixelFont);
     ui->UserName->setFont(pixelFont);
@@ -47,10 +49,13 @@ void MainWindow::setup_images()
     ui->friends_button->setIcon(ButtonIcon);
     ui->friends_button->setIconSize(friends_pic->rect().size());
     //Mood button
-    smile_pic = new QPixmap("://images/smile.png");
-    inactive_pic = new QPixmap("://images/inactive.png");
-    angry_pic = new QPixmap("://images/angry.png");
+    smile_pic = new QPixmap("://images/smile_43x43.png");
+    inactive_pic = new QPixmap("://images/inactive_43x43.png");
+    angry_pic = new QPixmap("://images/angry_43x43.png");
+    //Pester Chums
+    PesterChums = new QPixmap(":/images/PesterChums.png");
 
+    //buttons
     QIcon SmileIcon(*(smile_pic));
     QIcon AngryIcon(*(angry_pic));
     ui->pushButton_2->setIcon(SmileIcon);
@@ -65,13 +70,37 @@ void MainWindow::setup_images()
     ui->pushButton_6->setIconSize(smile_pic->rect().size());
     ui->pushButton_7->setIcon(SmileIcon);
     ui->pushButton_7->setIconSize(smile_pic->rect().size());
+    //big label
+    ui->picture->setPixmap(*(PesterChums));
+    ui->picture->setContentsMargins(0, 0, 0, 0);
+}
+
+void MainWindow::setup_buttons_mapper()
+{
+    signalMapper = new QSignalMapper(this);
+
+    QObject::connect(ui->pushButton_2, SIGNAL(clicked()), signalMapper, SLOT(map()));
+    QObject::connect(ui->pushButton_3, SIGNAL(clicked()), signalMapper, SLOT(map()));
+    QObject::connect(ui->pushButton_4, SIGNAL(clicked()), signalMapper, SLOT(map()));
+    QObject::connect(ui->pushButton_5, SIGNAL(clicked()), signalMapper, SLOT(map()));
+    QObject::connect(ui->pushButton_6, SIGNAL(clicked()), signalMapper, SLOT(map()));
+    QObject::connect(ui->pushButton_7, SIGNAL(clicked()), signalMapper, SLOT(map()));
+
+    signalMapper->setMapping(ui->pushButton_2, "smile");
+    signalMapper->setMapping(ui->pushButton_3, "angry");
+    signalMapper->setMapping(ui->pushButton_4, "smile");
+    signalMapper->setMapping(ui->pushButton_5, "smile");
+    signalMapper->setMapping(ui->pushButton_6, "smile");
+    signalMapper->setMapping(ui->pushButton_7, "smile");
+
+    QObject::connect(signalMapper, &QSignalMapper::mappedString, this, &MainWindow::changeStatus);
 }
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    setWindowFlags(windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+    //setWindowFlags(windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
     ui->setupUi(this);
     setup_font();
     cl = new client(this);
@@ -114,6 +143,7 @@ void MainWindow::startReadInThread()
 {
     ReadThread = new ThreadController(cl);
     QObject::connect(ReadThread, &ThreadController::throwFatalError, this, &MainWindow::proccesFatalError);
+    QObject::connect(ReadThread, &ThreadController::throwError, this, &MainWindow::proccesError);
     QObject::connect(ReadThread, &ThreadController::messageReady, this, &MainWindow::sendMessageByUsername);
     QObject::connect(ReadThread, &ThreadController::listOfUsersReady, this, &MainWindow::updateListOfUsers);
     QObject::connect(ReadThread, &ThreadController::getUsers, this, &MainWindow::getUsers);
@@ -121,7 +151,25 @@ void MainWindow::startReadInThread()
     QObject::connect(ReadThread, &ThreadController::getOgRequests, this, &MainWindow::getOgRequests);
     QObject::connect(ReadThread, &ThreadController::listOfIcReqReady, friendReq, &friendrequset::updateListOfIcReq);
     QObject::connect(ReadThread, &ThreadController::listOfOgReqReady, friendReq, &friendrequset::updateListOfOgReq);
+    QObject::connect(ReadThread, &ThreadController::gotNewMessage, this, &MainWindow::gotNewMessage);
+    QObject::connect(ReadThread, &ThreadController::sendLeaveMessage, this, &MainWindow::friendLeft);
+    QObject::connect(ReadThread, &ThreadController::sendJoinMessage, this, &MainWindow::friendJoin);
     ReadThread->emit startRead(cl);
+}
+
+void MainWindow::changeStatus(const QString &status)
+{
+    qDebug() << "chstatus worked";
+    std::string std_status = status.toStdString();
+    cl->writeMessage("/chstatus/" + std_status);
+    if (status == "smile") {
+        QString userlabel = "<img src=':/images/smile_28x23.png' style='vertical-align: middle;'> " + username;
+        ui->UserName->setText(userlabel);
+    }
+    if (status == "angry") {
+        QString userlabel = "<img src=':/images/angry_28x23.png' style='vertical-align: middle;'> " + username;
+        ui->UserName->setText(userlabel);
+    }
 }
 
 void MainWindow::deleteFriend(const QPoint& pos, const QModelIndex index)
@@ -142,12 +190,29 @@ void MainWindow::deleteFriend(const QPoint& pos, const QModelIndex index)
     }
 }
 
-void MainWindow::set_mood(std::string mood)
+void MainWindow::gotNewMessage(QString name)
 {
-    if (mood == "smile") {
-        //ui->UserName->setPixmap(*(mood_pic));
-        //ui->UserName->setText("zzz");
+    QModelIndexList indexes = usermodel->match(usermodel->index(0, 0), Qt::DisplayRole, QVariant::fromValue(name), -1, Qt::MatchExactly);
+    QModelIndex index = indexes.first();
+    qDebug() << usercontroller->chatIsOpen(index.data(Qt::DisplayRole).toString().toStdString());
+    if (usercontroller->chatIsOpen(index.data(Qt::DisplayRole).toString().toStdString())) {
+
     }
+    else {
+        usermodel->setData(index, "://images/new_message_alert.png", Qt::UserRole + 1);
+    }
+}
+
+void MainWindow::friendLeft(std::string name)
+{
+    if (usercontroller->chatIsOpen(name))
+        usercontroller->sendLeftMessage(name);
+}
+
+void MainWindow::friendJoin(std::string name)
+{
+    if (usercontroller->chatIsOpen(name))
+        usercontroller->sendJoinMessage(name);
 }
 
 void MainWindow::sendQuery(std::string query)
@@ -192,7 +257,7 @@ void MainWindow::getOgRequests()
     sendQuery("getlist");
 }
 
-void MainWindow::start(std::string S_user, client *auth_cl) {
+void MainWindow::start(QString S_user, client *auth_cl, QString lastStatus) {
     cl = auth_cl;
     auth_cl->giveNewParent(this);
     username = S_user;
@@ -206,10 +271,9 @@ void MainWindow::start(std::string S_user, client *auth_cl) {
     sendQuery("getogreq");
     setup_listview();
     setup_images();
-    //emit set_mood("smile");
-    QString QUserName = username.c_str(); // сделать по члвчски
-    QString userlabel = "<img src=':/images/smile.png' style='vertical-align: middle;'> " + QUserName;
+    QString userlabel = "<img src=':/images/"+lastStatus+"_28x23.png' style='vertical-align: middle;'> " + username;
     ui->UserName->setText(userlabel);
+    setup_buttons_mapper();
     this->show();
 }
 
@@ -220,17 +284,26 @@ void MainWindow::sendMessageByUsername(std::string sender_name, std::string mess
 
 void MainWindow::updateListOfUsers(std::string userlist)
 {
-    // /usr1/usr2/.../usrN/
+    // /usr1/status//usr2/.../usrN/status/
     ui->UserList->model()->removeRows(0, ui->UserList->model()->rowCount());
     size_t l_pos, r_pos;
     std::string recipient_name;
+    std::string status;
+    std::string avaible;
     l_pos = 1;
     if((r_pos = userlist.find("/", 1)) == std::string::npos) return;
     while(r_pos != std::string::npos) {
+        // getting username
         recipient_name = {userlist.begin() + l_pos, userlist.begin() + r_pos};
-        usermodel->addUserchat(recipient_name.c_str());
-        UserChat *chat = new UserChat(this, recipient_name, username, cl, fontFamily);
+        // getting status
+        l_pos = r_pos + 1;
+        r_pos = userlist.find("/", l_pos);
+        status = {userlist.begin() + l_pos, userlist.begin() + r_pos};
+        // doing stuff
+        usermodel->addUserchat(recipient_name.c_str(), status.c_str());
+        UserChat *chat = new UserChat(this, recipient_name, username.toStdString(), cl, fontFamily);
         usercontroller->addChat(recipient_name, chat);
+        // next step
         l_pos = r_pos + 1;
         r_pos = userlist.find("/", l_pos);
     }
@@ -245,6 +318,7 @@ void MainWindow::PesterClicked()
         QString text = data.toString();
 
         usercontroller->openChat(text.toStdString());
+        usermodel->setData(selectedIndex, NULL, Qt::UserRole + 1);
     }
 }
 
@@ -255,6 +329,7 @@ void MainWindow::on_UserList_doubleClicked(const QModelIndex &index)
     QString text = data.toString();
 
     usercontroller->openChat(text.toStdString());
+    usermodel->setData(index, NULL, Qt::UserRole + 1);
 }
 
 void MainWindow::on_friends_button_clicked()

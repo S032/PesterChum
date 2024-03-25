@@ -49,12 +49,17 @@ void Auth::on_SignInButton_clicked() // SIGN IN EVENT
         cl->Close();
         return;
     }
-    if (res == -2) {
+    else if (res == -2) {
         cl->emit throwError("Check ur login or password!");
         cl->Close();
         return;
     }
-    emit sendUser(username, cl);
+    else if (res == 1) {
+        emit sendUser(username.c_str(), cl, "angry");
+    }
+    else {
+        emit sendUser(username.c_str(), cl, "smile");
+    }
     this->close();
 }
 
@@ -76,7 +81,7 @@ void Auth::on_SignUpButton_clicked() // SIGN UP EVENT
         cl->Close();
         return;
     }
-    emit sendUser(username, cl);
+    emit sendUser(username.c_str(), cl, "smile");
     this->close();
 }
 

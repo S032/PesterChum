@@ -36,13 +36,13 @@ void ThreadController::requestAnswerHandler(std::string answer)
 
     }
     else if (answ == "exist") {
-
+        emit throwError("запрос уже существует!");
     }
     else if (answ == "notexist") {
-
+        emit throwError("такого пользователя не существует!");
     }
     else if (answ == "already") {
-
+        emit throwError("пользователь уже ваш друг!");
     }
     emit getOgRequests();
 }
@@ -70,6 +70,7 @@ void MessageReader::doWork(client *cl)
 void ThreadController::messageHandler(std::string message)
 {
     std::string sender = {message.begin(), message.begin() + message.find(":")};
+    emit gotNewMessage(sender.c_str());
     emit messageReady(sender, message);
 }
 
@@ -104,6 +105,22 @@ void ThreadController::answerHandler(std::string answer)
     }
     else if (cmd == "delfriend") {
         std::string notfriend_name; // добавить уведомление об удалении из др
+        emit getUsers();
+    }
+    else if (cmd == "left") {
+        emit getUsers();
+        l_pos = r_pos + 1;
+        std::string name = {answer.begin() + l_pos, answer.end()};
+        emit sendLeaveMessage(name);
+    }
+    else if (cmd == "log") {
+        emit getUsers();
+        l_pos = r_pos + 1;
+        if((r_pos = answer.find("/", l_pos)) == std::string::npos) return;
+        std::string name = {answer.begin() + l_pos, answer.begin() + r_pos};
+        emit sendJoinMessage(name);
+    }
+    else if (cmd == "chstatus") {
         emit getUsers();
     }
     else {

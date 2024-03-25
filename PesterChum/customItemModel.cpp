@@ -21,9 +21,20 @@ UserchatModel::UserchatModel(QObject *parent)
     QStandardItemModel(parent)
 {}
 
-void UserchatModel::addUserchat(const QString &username)
+void UserchatModel::addUserchat(const QString &username, const QString &status)
 {
     QStandardItem *item = new QStandardItem(QString("%1").arg(username));
+    QString pic_path;
+    if (status == "ofline") {
+        pic_path = inactive_pic_path;
+    }
+    else if (status == "angry") {
+        pic_path = angry_pic_path;
+    }
+    else {
+        pic_path = smile_pic_path;
+    }
+    item->setData(pic_path, Qt::UserRole);
     appendRow(item);
 }
 

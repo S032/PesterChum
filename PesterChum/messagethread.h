@@ -40,6 +40,9 @@ public slots:
     void answerHandler(std::string answer);
     void throwFatalErrorOccuried(QString errortext);
 signals:
+    void gotNewMessage(QString name);
+    void sendLeaveMessage(std::string name);
+    void sendJoinMessage(std::string name);
     void messageReady(std::string sender_name, std::string message);
     void listOfUsersReady(std::string userlist);
     void listOfIcReqReady(std::string icreqlist);
@@ -49,6 +52,7 @@ signals:
     void getOgRequests();
     void startRead(client *cl);
     void throwFatalError(QString errortext);
+    void throwError(QString errortext);
 };
 
 #endif // MESSAGETHREAD_H

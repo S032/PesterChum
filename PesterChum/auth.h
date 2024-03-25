@@ -25,7 +25,7 @@ private:
 public:
     client *cl;
 signals:
-    void sendUser(std::string R_user, client *cl);
+    void sendUser(QString R_user, client *cl, QString lastStatus);
 };
 
 #endif // AUTH_H

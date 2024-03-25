@@ -15,6 +15,7 @@
 #include <QFontDatabase>
 #include <QStandardItem>
 #include <QStandardItemModel>
+#include <QSignalMapper>
 #include <QThread>
 #include <QDebug>
 #include <windows.h>
@@ -36,6 +37,7 @@ private:
     void setup_listview();
     void setup_font();
     void setup_images();
+    void setup_buttons_mapper();
     void sendQuery(std::string query);
     void throw_message();
     void startReadInThread();
@@ -48,17 +50,19 @@ private:
     Auth                   *reg;
     friendrequset          *friendReq;
     client                 *cl;
-    std::string            username;
+    QString                username;
     QString                fontFamily;
     QPixmap                *friends_pic;
     QPixmap                *friends_pic_alert;
     QPixmap                *smile_pic;
     QPixmap                *inactive_pic;
     QPixmap                *angry_pic;
+    QPixmap                *PesterChums;
+    QSignalMapper          *signalMapper;
 public slots:
     void proccesFatalError(QString error);
     void proccesError(QString error);
-    void start(std::string S_user, client *cl);
+    void start(QString S_user, client *cl, QString lastStatus);
     void sendMessageByUsername(std::string sender_name, std::string message);
     void sendRequest(std::string name);
     void sendRequestAnswer(std::string name, std::string answer);
@@ -68,7 +72,10 @@ public slots:
     void updateListOfUsers(std::string userlist);
     void PesterClicked();
     void deleteFriend(const QPoint &pos, const QModelIndex);
-    void set_mood(std::string mood);
+    void gotNewMessage(QString name);
+    void friendLeft(std::string name);
+    void friendJoin(std::string name);
+    void changeStatus(const QString &status);
 signals:
     void startChat(std::string S_user, client *cl, QString fontFamily);
 private slots:

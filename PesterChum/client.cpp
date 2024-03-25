@@ -70,6 +70,6 @@ int client::log_user(std::string username, std::string password) {
     std::vector<char> buff(MAXLINE);
     recv(clientSock, buff.data(), buff.size(), 0);
     std::string answer(buff.data());
-    if (answer == "/f") return -2;
+    if (answer == "/status/angry") return 1;
     return 0;
 }

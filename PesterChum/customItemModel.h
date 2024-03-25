@@ -18,16 +18,20 @@ public:
 private slots:
     void on_pushButton_clicked();
 };
-
+////////////////////////////////////////////////
 class UserchatModel : public QStandardItemModel
 {
+private:
+    const QString smile_pic_path = "://images/smile_28x23.png";
+    const QString inactive_pic_path = ":/images/inactive28x22.png";
+    const QString angry_pic_path = "://images/angry_28x23.png";
 public:
     UserchatModel(QObject *parent = nullptr);
-    void addUserchat(const QString &username);
+    void addUserchat(const QString &username, const QString &status);
 private slots:
     void on_friends_button_clicked();
 };
-
+//////////////////////////////////////////////////
 class RequestModel : public QStandardItemModel
 {
 public:
