@@ -2,7 +2,6 @@
 
 void ChatDatabase::print_err(sql::SQLException e) {
     std::cerr << "# ERR: SQLException in " << __FILE__;
-    std::cerr << " on line " << __LINE__ << std::endl;
     std::cerr << "# ERR: " << e.what();
     std::cerr << " (MySQL error code: " << e.getErrorCode();
     std::cerr << ", SQLState: " << e.getSQLState() << " )" << std::endl;
@@ -36,6 +35,7 @@ int ChatDatabase::find_next_id(sql::SQLString Table) {
     }
     catch(sql::SQLException &e)
     {
+        printf("find_next_id:\n");
         print_err(e);
         return -1;
     }
@@ -52,6 +52,7 @@ bool ChatDatabase::check_username(user_t *user) {
     }
     catch(sql::SQLException &e)
     {
+        printf("check_username:\n");
         print_err(e);
         return false;
     }
@@ -69,6 +70,25 @@ int ChatDatabase::UsernameToInt(std::string username) {
     }
     catch(sql::SQLException &e)
     {
+        printf("usernameToInt:\n");
+        print_err(e);
+        return -1;
+    }
+}
+
+int ChatDatabase::statusToInt(std::string status) {
+    try
+    {
+        sql::SQLString query = "SELECT ID FROM Status";
+        query += " WHERE Status = '"+status+"'";
+        stmt = conn->createStatement();
+        rs= stmt->executeQuery(query);
+        if(!rs->next()) return -1;
+        return rs->getInt("ID");
+    }
+    catch(sql::SQLException &e)
+    {
+        printf("usernameToInt:\n");
         print_err(e);
         return -1;
     }
@@ -89,8 +109,32 @@ bool ChatDatabase::check_user_in_chattable(std::string sender_name, std::string 
     }
     catch(sql::SQLException &e)
     {
+        printf("check_user:\n");
         print_err(e);
         return false;
+    }
+}
+
+std::vector<std::string> ChatDatabase::getFriendList(std::string username) {
+    try
+    {
+        std::vector<std::string> friendList;
+        sql::SQLString query = "SELECT US2.UserName FROM Chats AS CH";
+        query += " INNER JOIN User AS US1 ON CH.User1 = US1.ID";
+        query += " INNER JOIN User AS US2 ON CH.User2 = US2.ID";
+        query += " WHERE US1.UserName = '"+username+"'";
+        stmt = conn->createStatement();
+        rs= stmt->executeQuery(query);
+        while(rs->next()) {
+            friendList.push_back(rs->getString("UserName"));
+        }
+        return friendList;
+    }
+    catch(sql::SQLException &e)
+    {
+        printf("check_user:\n");
+        print_err(e);
+        return {};
     }
 }
 
@@ -103,11 +147,12 @@ bool ChatDatabase::reg_user(user_t *user) {
         std::string next_id = std::to_string(find_next_id("User"));
         stmt = conn->createStatement(); 
 
-        stmt->execute("INSERT INTO User VALUE("+ next_id +", '"+user->login+"', '"+user->password+"', 3)");
+        stmt->execute("INSERT INTO User VALUE("+ next_id +", '"+user->login+"', '"+user->password+"', 1)");
         return true;
     }
     catch(sql::SQLException &e)
     {
+        printf("reg_user:\n");
         print_err(e);
         return false;
     }
@@ -116,40 +161,19 @@ bool ChatDatabase::reg_user(user_t *user) {
 bool ChatDatabase::log_user(user_t *user) {
     try
     {
-        sql::SQLString query = "SELECT U.UserName, U.Password, R.Role FROM User AS U";
-        query += " INNER JOIN Roles AS R ON U.Role = R.ID";
+        sql::SQLString query = "SELECT U.UserName, U.Password, S.Status FROM User AS U";
+        query += " INNER JOIN Status AS S ON U.Status = S.ID";
         query += " WHERE U.UserName = '"+user->login+"' AND U.Password = '"+user->password+"'";
         stmt = conn->createStatement();
         rs = stmt->executeQuery(query);
         if(!rs->next())
             return false;
-        user->role = rs->getString("Role");
+        user->status = rs->getString("Status");
         return true;
     }
     catch(sql::SQLException &e)
     {
-        print_err(e);
-        return false;
-    }
-}
-
-bool ChatDatabase::getListOfUsers(std::string *answer, std::string username) {
-    try
-    {
-        *(answer) = "/userlist/";
-        sql::SQLString query = "SELECT US2.UserName FROM Chats AS CH";
-        query += " INNER JOIN User AS US1 ON CH.User1 = US1.ID";
-        query += " INNER JOIN User AS US2 ON CH.User2 = US2.ID";
-        query += " WHERE US1.UserName = '"+username+"'";
-        stmt = conn->createStatement();
-        rs = stmt->executeQuery(query);
-        while(rs->next()) {
-            *(answer) += rs->getString("UserName") + "/";
-        }
-        return true;
-    }
-    catch(sql::SQLException &e)
-    {
+        printf("log_user:\n");
         print_err(e);
         return false;
     }
@@ -172,6 +196,7 @@ bool ChatDatabase::getListOfIcReq(std::string *answer, std::string username) {
     }
     catch(sql::SQLException &e)
     {
+        printf("getListOfIcReq:\n");
         print_err(e);
         return false;
     }
@@ -194,6 +219,7 @@ bool ChatDatabase::getListOfOgReq(std::string *answer, std::string username) {
     }
     catch(sql::SQLException &e)
     {
+        printf("getListOfOgReq:\n");
         print_err(e);
         return false;
     }
@@ -214,7 +240,7 @@ bool ChatDatabase::addRequest(std::string sender_name, std::string recipient_nam
         stmt = conn->createStatement();
         rs = stmt->executeQuery(query);
         if (rs->next()) {
-            *(answer) = "/reqanswer/" + recipient_name + "/exist";
+            *(answer) = "/reqanswer/" + recipient_name + "/already";
             return false;
         }
         //adding request
@@ -230,6 +256,7 @@ bool ChatDatabase::addRequest(std::string sender_name, std::string recipient_nam
             *(answer) = "/reqanswer/" + recipient_name + "/exist";
             return false;
         }
+        printf("addRequest:\n");
         print_err(e);
         return false;
     }
@@ -253,6 +280,7 @@ bool ChatDatabase::delRequest(std::string requester_name, std::string recipient_
     }
     catch(sql::SQLException &e)
     {
+        printf("delRequest:\n");
         print_err(e);
         return false;
     }
@@ -274,13 +302,14 @@ bool ChatDatabase::makeChat(std::string user1, std::string user2) {
     }
     catch(sql::SQLException &e)
     {
+        printf("makeChat:\n");
         print_err(e);
         return false;
     }
 }
 
 bool ChatDatabase::delChat(std::string sender_name, std::string friend_name) {
-        try
+    try
     {
         std::string sender_id = std::to_string(UsernameToInt(sender_name));
         std::string friend_id = std::to_string(UsernameToInt(friend_name));
@@ -295,6 +324,27 @@ bool ChatDatabase::delChat(std::string sender_name, std::string friend_name) {
     }
     catch(sql::SQLException &e)
     {
+        printf("delChat:\n");
+        print_err(e);
+        return false;
+    }
+}
+
+bool ChatDatabase::writeLastStatus(std::string username, std::string status) {
+    try
+    {
+        std::string status_id = std::to_string(statusToInt(status));
+        if (status_id == "-1") return false;
+        sql::SQLString query = "UPDATE User";
+        query += " SET Status = "+status_id;
+        query += " WHERE UserName = '"+username+"'";
+        stmt = conn->createStatement();
+        stmt->execute(query);
+        return true;
+    }
+    catch(sql::SQLException &e)
+    {
+        printf("writeLastStatus:\n");
         print_err(e);
         return false;
     }

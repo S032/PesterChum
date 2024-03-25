@@ -12,9 +12,10 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <netinet/tcp.h>
 #include <unistd.h>
 #include <iostream>
-#include <unordered_map>
+#include <utility>
 #include <map>
 
 /* Conection Constants */
@@ -28,6 +29,13 @@
 /* Acronym */
 #define SA  struct sockaddr
 
+using client_t = std::map<std::string, std::pair<int, std::string>>;
+
+struct user_status_t {
+    std::string name;
+    std::string status;
+};
+
 class QuerryHandler;
 
 class server
@@ -39,7 +47,10 @@ private:
     int                maxfd, listenfd, connfd;
     int                sockcount, client[FD_SETSIZE];
     std::map<int, std::string> clients;
-    std::vector<int>   sockToDelete; 
+    client_t           clients_fast; 
+    std::vector<int>   sockToDelete;
+    std::vector<std::pair<int, user_t>> clientsToAdd;
+    std::vector<std::string> clientsToDelete;
     ssize_t            n;
     fd_set             readset, allset;
     char               buf[MAXLINE];
@@ -51,6 +62,11 @@ public:
     void start();
     void stop();
     void send_to(int currentsockfd, std::string recipient_name, std::string message);
+    bool send_to_fast(std::string username, std::string message);
+    void sendMessageToFriends(std::string username, std::string message);
+    void addClient(int cur_sock, user_t user);
+    client_t getClients();
+    client_t* getClientsAddr();
 private:
     void exit_err(const char*);
     void init();
@@ -74,8 +90,8 @@ public:
     QuerryHandler(ChatDatabase *Q_DB, server *Q_SV);
     bool make_querry(int cur_sock, std::string q_query, std::string *username);
 private:
-    std::string log_querry();
-    std::string reg_querry();
+    user_t log_querry();
+    user_t reg_querry();
     std::string sendto_querry();
     std::string giveListOfUser();
     std::string giveListOfIcReq();
@@ -83,6 +99,7 @@ private:
     std::string sendreq();
     std::string reqanswer();
     std::string deleteFriend();
+    std::string changeStatus();
 };
 
 #endif

@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <netinet/tcp.h>
 #include <unistd.h>
 #include <iostream>
 
@@ -25,5 +26,6 @@ int main(int argc, char **argv) {
     sockfd = Socket(AF_INET, SOCK_STREAM, 0);
     Connect(sockfd, (const struct sockaddr *) &servaddr, sizeof(servaddr));
     std::cout << "successfully connected" << std::endl;
+    //send(sockfd, "/log/test2/test2", sizeof("/log/test2/test2"), 0);
     str_cli(STDIN_FILENO, sockfd);
 }

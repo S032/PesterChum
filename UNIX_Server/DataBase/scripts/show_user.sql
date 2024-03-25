@@ -1,3 +1,2 @@
-SELECT U.UserName, U.Password, R.Role FROM User AS U
-INNER JOIN Roles AS R ON U.Role = R.ID
-WHERE U.UserName = 'Chepush' AND U.Password = '1234'
+SELECT U.UserName, U.Password, S.Status FROM User AS U
+INNER JOIN Status AS S ON U.Status = S.ID

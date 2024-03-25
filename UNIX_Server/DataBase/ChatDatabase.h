@@ -7,6 +7,7 @@
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 #include <iostream>
+#include <vector>
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -14,7 +15,7 @@
 struct user_t {
     std::string login;
     std::string password;
-    std::string role;
+    std::string status;
 };
 
 class ChatDatabase {
@@ -33,15 +34,17 @@ public:
     bool reg_user(user_t *user);
     bool log_user(user_t *user);
     bool check_user_in_chattable(std::string sender_name, std::string recipient_name);
-    bool getListOfUsers(std::string *answer, std::string username);
+    std::vector<std::string> getFriendList(std::string username);
     bool getListOfIcReq(std::string *answer, std::string username);
     bool getListOfOgReq(std::string *answer, std::string username);
     bool addRequest(std::string sender_name, std::string recipient_name, std::string *answer);
     bool delRequest(std::string requester_name, std::string recipient_name, std::string *answer);
     bool makeChat(std::string user1, std::string user2);
     bool delChat(std::string sender_name, std::string friend_name);
+    bool writeLastStatus(std::string username, std::string status);
 private:
     int UsernameToInt(std::string username);
+    int statusToInt(std::string status);
     int find_next_id(sql::SQLString Table);
     bool check_username(user_t *user);
     void print_err(sql::SQLException e);

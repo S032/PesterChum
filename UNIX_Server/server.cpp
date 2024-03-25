@@ -36,30 +36,55 @@ void server::init() {
     printf("Server started on %d\n", SERV_PORT);
 }
 
-std::string QuerryHandler::log_querry() {
+user_t QuerryHandler::log_querry() {
+    user_t newuser = {"", "", ""};
     l_pos = r_pos + 1;
     if ((r_pos = query.find('/', l_pos)) == std::string::npos) 
-        return answer;
-    usr.login = {query.begin() + l_pos, query.begin() + r_pos};
+        return newuser;
+    newuser.login = {query.begin() + l_pos, query.begin() + r_pos};
     l_pos = r_pos + 1 ;
-    usr.password = {query.begin() + l_pos, query.end()};
-    if (DB->log_user(&usr)) *(auth_username) = usr.login, answer = "/s";
-    return answer;
+    newuser.password = {query.begin() + l_pos, query.end()};
+    if (DB->log_user(&newuser)) {
+        answer = "/status/" + newuser.status;
+        SV->addClient(current_sock, newuser);
+        std::string message = "/log/" + newuser.login + "/" + newuser.status;
+        SV->sendMessageToFriends(newuser.login, message);
+    }
+    return newuser;
 }
 
-std::string QuerryHandler::reg_querry() {
+user_t QuerryHandler::reg_querry() {
+    user_t newuser = {"", "", ""};
     l_pos = r_pos + 1;
     if ((r_pos = query.find('/', l_pos)) == std::string::npos)
-        return answer;
-    usr.login = {query.begin() + l_pos, query.begin() + r_pos};
+        return newuser;
+    newuser.login = {query.begin() + l_pos, query.begin() + r_pos};
     l_pos = r_pos + 1 ;
-    usr.password = {query.begin() + l_pos, query.end()};
-    if (DB->reg_user(&usr)) *(auth_username) = usr.login, answer = "/s";
-    return answer;
+    newuser.password = {query.begin() + l_pos, query.end()};
+    newuser.status = "smile";
+    if (DB->reg_user(&newuser)) {
+        *(auth_username) = newuser.login;
+        answer = "/s";
+        SV->addClient(current_sock, newuser);
+    }
+    return newuser;
 }
 
 std::string QuerryHandler::giveListOfUser() {
-    DB->getListOfUsers(&answer, *(auth_username)); 
+    answer = "/userlist/";
+    client_t onlineList = SV->getClients();
+    std::vector<std::string> friends = DB->getFriendList(*(auth_username));
+    for (std::string friend_name : friends) {
+        user_status_t friendZ;
+        friendZ.name = friend_name;
+        if (onlineList.find(friend_name) != onlineList.end()) {
+            friendZ.status = onlineList[friend_name].second;
+        }
+        else {
+            friendZ.status = "ofline";
+        }
+        answer += friendZ.name + "/" + friendZ.status + "/";
+    } 
     return answer;
 }
 
@@ -89,7 +114,7 @@ std::string QuerryHandler::sendto_querry() {
     //sending
     if (!DB->check_user_in_chattable(*(auth_username), recipient)) return answer;
     answer = "/s";
-    SV->send_to(current_sock, recipient, message);
+    SV->send_to_fast(recipient, message);
     return answer;
 }
 
@@ -100,7 +125,7 @@ std::string QuerryHandler::sendreq() {
     recipient = {query.begin() + l_pos, query.end()};
     //trying add req in database
     if(DB->addRequest(*(auth_username), recipient, &answer)) {
-        SV->send_to(current_sock, recipient, "/newreq/");
+        SV->send_to_fast(recipient, "/newreq/");
     }
     return answer;
 }
@@ -117,19 +142,19 @@ std::string QuerryHandler::reqanswer() {
     if (req_answer == "accept") {
         if (DB->delRequest(requester, *(auth_username), &answer)) {
             if (DB->makeChat(*(auth_username), requester)) {
-                SV->send_to(current_sock, requester
-                , "/reqanswer/" + *(auth_username) + "/accept");
+                SV->send_to_fast(requester
+                    , "/reqanswer/" + *(auth_username) + "/accept");
             }
             else {
-                SV->send_to(current_sock, requester
-                , "/reqanswer/" + requester + "/notexist");
+                SV->send_to_fast(requester
+                    , "/reqanswer/" + requester + "/notexist");
             }
         }        
     }
     else if (req_answer == "denied") {
         if (DB->delRequest(requester, *(auth_username), &answer)) {
-            SV->send_to(current_sock, requester
-            , "/reqanswer/" + *(auth_username) + "/denied");
+            SV->send_to_fast(requester
+                , "/reqanswer/" + *(auth_username) + "/denied");
         }
     }
     else {
@@ -147,24 +172,33 @@ std::string QuerryHandler::deleteFriend() {
     //getting username
     friend_name = {query.begin() + l_pos, query.end()};
     if (DB->delChat(*(auth_username), friend_name)) {
-        SV->send_to(current_sock, friend_name , "/delfriend/"+*(auth_username));
+        SV->send_to_fast(friend_name , "/delfriend/"+*(auth_username));
         answer = "/s";
     }
     return answer;
 }
 
+std::string QuerryHandler::changeStatus() {
+    std::string              status, username;
+    client_t                 *clients;
+
+    l_pos = r_pos + 1;
+    status = {query.begin() + l_pos, query.end()};
+    username = *(auth_username);
+    clients = SV->getClientsAddr();
+
+    if (status == "smile" || status == "angry" ) { //если станет больше статусов придумать что то получше
+        (*clients)[username].second = status;
+        SV->sendMessageToFriends(username, "/chstatus/" + username + "/" + status);
+        return answer = "/s";
+    }
+    return answer = "/f";
+}
+
 bool QuerryHandler::make_querry(int cur_sock, std::string q_query, std::string *username) {
-    /* 
-    /reg/login/password - reg new acc
-    /log/login/password - log in acc
-    /sendto/to_whom/message - send message to user
-    /sendreq/to_whom - send req to user
-    /getlist/ - get list of friends
-    /getreq/ - get list of requests
-    /reqanswer/to_whom/(accept or denied) - answer to request
-    */
     answer = "/f";
     auth_username = username;
+    current_sock = cur_sock;
     r_pos = l_pos = 0;
     query = q_query;
     bool result;
@@ -176,7 +210,8 @@ bool QuerryHandler::make_querry(int cur_sock, std::string q_query, std::string *
         reg_querry(); 
     }
     else if (cmd == "log") {
-        log_querry();
+        user_t log_usr = log_querry();
+        *(username) = log_usr.login;
     }
     else if (*(auth_username) == "") {
         answer = "you have no right for this...";
@@ -202,6 +237,9 @@ bool QuerryHandler::make_querry(int cur_sock, std::string q_query, std::string *
     else if (cmd == "delfriend") {
         deleteFriend();
     }
+    else if (cmd == "chstatus") {
+        changeStatus();
+    }
     else {
         std::cout << "fuck\n";
     }
@@ -217,6 +255,34 @@ void server::send_to(int currentsockfd, std::string recipient_name, std::string 
         }
 }
 
+bool server::send_to_fast(std::string username, std::string message) {
+    if (clients_fast.find(username) == clients_fast.end())
+        return false;
+    send(clients_fast[username].first, message.c_str(), message.size(), 0);
+    return true;
+}
+
+void server::sendMessageToFriends(std::string username, std::string message) {
+    for (std::string friend_name : DB->getFriendList(username)) {
+        if (clients_fast.find(friend_name) != clients_fast.end())
+            send(clients_fast[friend_name].first, message.c_str(), message.size(), 0);
+        else 
+            std::cout << friend_name << " is ofline\n";
+    }
+}
+
+void server::addClient(int cur_sock, user_t user) {
+    clientsToAdd.push_back(std::make_pair(cur_sock, user));
+}
+
+client_t server::getClients() {
+    return clients_fast;
+}
+
+client_t* server::getClientsAddr() {
+    return &clients_fast;
+}
+
 void server::recieve(int currentsockfd, std::string *username) {
     memset(buf, 0, sizeof(buf));
     n = recv(currentsockfd, buf, MAXLINE, 0);
@@ -224,12 +290,14 @@ void server::recieve(int currentsockfd, std::string *username) {
         FD_CLR(currentsockfd, &readset);
         FD_CLR(currentsockfd, &allset);
         sockToDelete.push_back(currentsockfd);
+        if(*(username) != "") {
+            clientsToDelete.push_back(*(username));
+            std::string message = "/left/" + *(username);
+            sendMessageToFriends(*(username), message);
+            DB->writeLastStatus(*(username), clients_fast[*(username)].second);
+        }
 
-        getpeername(currentsockfd, (SA*) &cliaddr, &clilen);
-        char ip[32];
-        uint16_t port = htons(cliaddr.sin_port);
-        inet_ntop(AF_INET, &cliaddr.sin_addr, ip, INET_ADDRSTRLEN);
-        printf("'%s' disconected from <%s:%d>\n", username->c_str(), ip, port);
+        printf("'%s' disconected\n", username->c_str());
         close(currentsockfd);
         return;
     }
@@ -290,6 +358,16 @@ server::proccess() {
         for (int sock : sockToDelete) {
             clients.erase(sock);   
         }
+        for (std::string username : clientsToDelete) {
+            clients_fast.erase(username);
+        }
+        for (std::pair<int, user_t> user : clientsToAdd) {
+            clients_fast.insert({user.second.login
+                                 , std::make_pair(user.first
+                                                  , user.second.status)});
+        }
+        clientsToAdd.clear();
+        clientsToDelete.clear();
         sockToDelete.clear();
     }
 }
