@@ -61,6 +61,7 @@ public:
 public:
     void start();
     void stop();
+    bool SendMessage(int sockfd, std::string message);
     void send_to(int currentsockfd, std::string recipient_name, std::string message);
     bool send_to_fast(std::string username, std::string message);
     void sendMessageToFriends(std::string username, std::string message);
@@ -68,6 +69,7 @@ public:
     client_t getClients();
     client_t* getClientsAddr();
 private:
+    bool ReadMessage(int sockfd, void *buff);
     void exit_err(const char*);
     void init();
     void recieve(int, std::string*);

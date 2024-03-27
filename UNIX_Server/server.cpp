@@ -244,30 +244,28 @@ bool QuerryHandler::make_querry(int cur_sock, std::string q_query, std::string *
         std::cout << "fuck\n";
     }
     std::cout << answer << std::endl;
-    send(cur_sock, answer.c_str(), answer.size(), 0);
+    SV->SendMessage(cur_sock, answer);
     return true;
 }
 
 void server::send_to(int currentsockfd, std::string recipient_name, std::string message) {
     for (const auto& [sock, username] : clients) {
         if (username == recipient_name)
-            send(sock, message.c_str(), message.size(), 0);
+            SendMessage(sock, message);
         }
 }
 
 bool server::send_to_fast(std::string username, std::string message) {
     if (clients_fast.find(username) == clients_fast.end())
         return false;
-    send(clients_fast[username].first, message.c_str(), message.size(), 0);
+    SendMessage(clients_fast[username].first, message);
     return true;
 }
 
 void server::sendMessageToFriends(std::string username, std::string message) {
     for (std::string friend_name : DB->getFriendList(username)) {
         if (clients_fast.find(friend_name) != clients_fast.end())
-            send(clients_fast[friend_name].first, message.c_str(), message.size(), 0);
-        else 
-            std::cout << friend_name << " is ofline\n";
+            SendMessage(clients_fast[friend_name].first, message);
     }
 }
 
@@ -283,10 +281,40 @@ client_t* server::getClientsAddr() {
     return &clients_fast;
 }
 
+bool server::ReadMessage(int sockfd, void *buff) {
+    uint32_t messageLength;
+    ssize_t needToRead = sizeof(uint32_t);
+    ssize_t readLength;
+
+    //reading a usefull information size
+    while(needToRead > 0) {
+        if ((readLength = recv(sockfd, &messageLength, needToRead, 0)) <= 0) return false;
+        needToRead -= readLength;
+    }
+    messageLength = ntohl(messageLength);
+    std::cout << "messagelength: " << messageLength << std::endl;
+    //reading a message
+    while(messageLength > 0) {
+        if ((readLength = recv(sockfd, buff, messageLength, 0)) <= 0) return false;
+        messageLength -= readLength;
+    } 
+    return true;
+}
+
+bool server::SendMessage(int sockfd, std::string message) {
+    uint32_t messageLength = htonl(message.size());
+    //sending a useful information size
+    if (send(sockfd, &messageLength, sizeof(messageLength), 0) <= 0)
+        return false;
+    //sending a message
+    if (send(sockfd, message.c_str(), message.size(), 0) <= 0)
+        return false;
+    return true;
+}
+
 void server::recieve(int currentsockfd, std::string *username) {
     memset(buf, 0, sizeof(buf));
-    n = recv(currentsockfd, buf, MAXLINE, 0);
-    if (n == 0 || n == -1) {
+    if (!ReadMessage(currentsockfd, buf)) {
         FD_CLR(currentsockfd, &readset);
         FD_CLR(currentsockfd, &allset);
         sockToDelete.push_back(currentsockfd);
@@ -312,7 +340,7 @@ void server::recieve(int currentsockfd, std::string *username) {
    if (clients[currentsockfd] != "") {
         for (const auto& [sock, username] : clients) {
             if (sock != currentsockfd && username != "")
-                send(sock, buf, n, 0);
+                SendMessage(sock, buf);
         }
    }
 }
