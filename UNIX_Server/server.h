@@ -3,6 +3,7 @@
 
 #include "DataBase/ChatDatabase.h"
 #include <errno.h>
+#include <ctime>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -61,13 +62,14 @@ public:
 public:
     void start();
     void stop();
-    bool SendMessage(int sockfd, std::string message);
+    bool SendMessage(int sockfd, std::string message, std::string recipient_name);
     void send_to(int currentsockfd, std::string recipient_name, std::string message);
     bool send_to_fast(std::string username, std::string message);
     void sendMessageToFriends(std::string username, std::string message);
     void addClient(int cur_sock, user_t user);
     client_t getClients();
     client_t* getClientsAddr();
+    std::string getTime();
 private:
     bool ReadMessage(int sockfd, void *buff);
     void exit_err(const char*);

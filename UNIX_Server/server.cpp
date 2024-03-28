@@ -33,7 +33,9 @@ void server::init() {
     DB = new ChatDatabase;
     querry = new QuerryHandler(DB, this);
 
-    printf("Server started on %d\n", SERV_PORT);
+    printf("Server started on %d at ", SERV_PORT);
+
+    std::cout << getTime() << std::endl;
 }
 
 user_t QuerryHandler::log_querry() {
@@ -161,8 +163,6 @@ std::string QuerryHandler::reqanswer() {
         return answer;
     }
 
-    std::cout << "requester: " << requester << std::endl;
-    std::cout << "req answer: " << req_answer << std::endl;
     return answer;
 }
 
@@ -243,29 +243,29 @@ bool QuerryHandler::make_querry(int cur_sock, std::string q_query, std::string *
     else {
         std::cout << "fuck\n";
     }
-    std::cout << answer << std::endl;
-    SV->SendMessage(cur_sock, answer);
+
+    SV->SendMessage(cur_sock, answer, *(auth_username));
     return true;
 }
 
 void server::send_to(int currentsockfd, std::string recipient_name, std::string message) {
     for (const auto& [sock, username] : clients) {
         if (username == recipient_name)
-            SendMessage(sock, message);
+            SendMessage(sock, message, username);
         }
 }
 
 bool server::send_to_fast(std::string username, std::string message) {
     if (clients_fast.find(username) == clients_fast.end())
         return false;
-    SendMessage(clients_fast[username].first, message);
+    SendMessage(clients_fast[username].first, message, username);
     return true;
 }
 
 void server::sendMessageToFriends(std::string username, std::string message) {
     for (std::string friend_name : DB->getFriendList(username)) {
         if (clients_fast.find(friend_name) != clients_fast.end())
-            SendMessage(clients_fast[friend_name].first, message);
+            SendMessage(clients_fast[friend_name].first, message, friend_name);
     }
 }
 
@@ -285,6 +285,8 @@ bool server::ReadMessage(int sockfd, void *buff) {
     uint32_t messageLength;
     ssize_t needToRead = sizeof(uint32_t);
     ssize_t readLength;
+    //char *readedMessage = nullptr;
+    uint32_t totalLength = 0;
 
     //reading a usefull information size
     while(needToRead > 0) {
@@ -292,24 +294,56 @@ bool server::ReadMessage(int sockfd, void *buff) {
         needToRead -= readLength;
     }
     messageLength = ntohl(messageLength);
-    std::cout << "messagelength: " << messageLength << std::endl;
+    //readedMessage = new char[messageLength + 1];
+    memset(buff, 0, messageLength);
+    std::cout << "reading a message...\n";
+    std::cout << "messageLength: " << messageLength << std::endl;
+
+
     //reading a message
     while(messageLength > 0) {
-        if ((readLength = recv(sockfd, buff, messageLength, 0)) <= 0) return false;
+        if ((readLength = recv(sockfd, static_cast<char*>(buff) + totalLength, messageLength, 0)) <= 0) {
+            //delete[] readedMessage;
+            return false;
+        }
         messageLength -= readLength;
-    } 
+        totalLength += readLength;
+    }
+    //readedMessage[totalLength] = '\0';
+    //buff = static_cast<void*>(readedMessage);
+    //delete[] readedMessage;
     return true;
 }
 
-bool server::SendMessage(int sockfd, std::string message) {
+bool server::SendMessage(int sockfd, std::string message, std::string recipient_name) {
     uint32_t messageLength = htonl(message.size());
+    int needToSend = sizeof(uint32_t);
+    int sendedLength;
+
     //sending a useful information size
-    if (send(sockfd, &messageLength, sizeof(messageLength), 0) <= 0)
-        return false;
+    while(needToSend > 0) {
+        if ((sendedLength = send(sockfd, &messageLength, needToSend, 0)) <= 0)
+            return false;
+        needToSend -= sendedLength;
+    }
     //sending a message
-    if (send(sockfd, message.c_str(), message.size(), 0) <= 0)
-        return false;
+    messageLength = ntohl(messageLength);
+    std::cout << "sending a message...\n";
+    std::cout << "messageLength: " << messageLength << std::endl; 
+    while(messageLength > 0) {
+        if ((sendedLength = send(sockfd, message.c_str(), message.size(), 0)) <= 0)
+            return false;
+        messageLength -= sendedLength;
+    }
+    std::cout << "sended["+recipient_name+"]: "+message+" "+getTime() << std::endl;
     return true;
+}
+
+std::string server::getTime() {
+    std::time_t currentTime = std::time(nullptr);
+    char buffer[80];
+    std::strftime(buffer, sizeof(buffer), "[%d-%m-%Y %H:%M:%S]", std::localtime(&currentTime));
+    return std::string(buffer);
 }
 
 void server::recieve(int currentsockfd, std::string *username) {
@@ -324,13 +358,13 @@ void server::recieve(int currentsockfd, std::string *username) {
             sendMessageToFriends(*(username), message);
             DB->writeLastStatus(*(username), clients_fast[*(username)].second);
         }
+        std::cout << *(username)+"'s disconected at " << getTime() << std::endl;
 
-        printf("'%s' disconected\n", username->c_str());
         close(currentsockfd);
         return;
     }
     
-    printf("%s\n", buf);
+    std::cout << "("+*(username)+"): "+buf+" "+getTime() << std::endl; 
     if (buf[0] == '/') {
         std::string query(buf);
         querry->make_querry(currentsockfd, query, username);
@@ -340,7 +374,7 @@ void server::recieve(int currentsockfd, std::string *username) {
    if (clients[currentsockfd] != "") {
         for (const auto& [sock, username] : clients) {
             if (sock != currentsockfd && username != "")
-                SendMessage(sock, buf);
+                SendMessage(sock, buf, username);
         }
    }
 }
@@ -369,8 +403,8 @@ server::proccess() {
             char ip[32];
             uint16_t port = ntohs(cliaddr.sin_port);
             inet_ntop(AF_INET, &cliaddr.sin_addr, ip, INET_ADDRSTRLEN);
-            printf("Client is connected from <%s:%d>\n", ip, port);
-
+            std::cout << "client's connected from <"<<ip<<":"<<port<<"> at "
+                                                  << getTime() << std::endl;
             sockcount--;
             if (sockcount <= 0)
                 continue;
