@@ -50,7 +50,7 @@
         <string notr="true">color: rgb(0, 0, 0);</string>
        </property>
        <property name="text">
-        <string>ЗАПРОСЫВКОРЕША:</string>
+        <string>ЗАПРОСЫВДРУЗЬЯ:</string>
        </property>
       </widget>
      </item>
@@ -67,12 +67,14 @@
 	background-color: #000000;
 	color: #ffffff;
     border: 5px solid #fff700;
+	padding: 0px;
 }
 
 QListView::item:hover {
 	background-color: rgb(67, 67, 67);
 	color: #ffffff;
     border: 5px solid #fff700;
+	outline: none;
 	cursor: pointer; 
 }
 </string>
@@ -212,6 +214,7 @@ border: 5px solid rgba(197, 139, 3, 1);
 	background-color: #000000;
 	color: #ffffff;
     border: 5px solid #fff700;
+	padding: 0px;
 }
 
 QListView::item:hover {

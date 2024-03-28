@@ -59,7 +59,7 @@ void UserChat::writeLeftMessage()
     std::string message = recipient_name + " вышел в ofline";
     model->addMessage(message.c_str(), Qt::gray);
 }
-
+// пофиксить кри нж
 void UserChat::writeJoinMessage()
 {
     std::string message = recipient_name + " снова online";
@@ -99,6 +99,7 @@ void UserchatsController::addChat(std::string login, UserChat *chat)
 void UserchatsController::openChat(std::string login)
 {
     userchats[login]->show();
+    userchats[login]->update();
 }
 
 void UserchatsController::sendMessageToChat(std::string login, std::string message)

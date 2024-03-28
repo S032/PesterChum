@@ -10,5 +10,7 @@
         <file>images/new_message_alert.png</file>
         <file>images/angry_28x23.png</file>
         <file>images/PesterChums.png</file>
+        <file>images/notifications_alert_41x41.png</file>
+        <file>images/notifications_41x41.png</file>
     </qresource>
 </RCC>

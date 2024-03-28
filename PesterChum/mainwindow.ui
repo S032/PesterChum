@@ -48,7 +48,7 @@
          </font>
         </property>
         <property name="text">
-         <string>ДОСТАНЬКОРЕША 6.0</string>
+         <string>PESTERCHUM 6.0</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -192,7 +192,7 @@
            <string notr="true">color: rgb(0, 0, 0);</string>
           </property>
           <property name="text">
-           <string>КОРЕШСПИСОК:</string>
+           <string>СПИСОКДРУЗЕЙ:</string>
           </property>
          </widget>
         </item>
@@ -337,7 +337,7 @@ border: 5px solid rgba(197, 139, 3, 1);
 }</string>
           </property>
           <property name="text">
-           <string>ДОСТАТЬ!</string>
+           <string>ОТПРАВИТЬ!</string>
           </property>
          </widget>
         </item>
@@ -430,7 +430,7 @@ border: 5px solid rgba(197, 139, 3, 1);
            <string notr="true">color: rgb(0, 0, 0);</string>
           </property>
           <property name="text">
-           <string>МОЙКОРЕШНИК:</string>
+           <string>МОЙНИКНЕЙМ:</string>
           </property>
          </widget>
         </item>

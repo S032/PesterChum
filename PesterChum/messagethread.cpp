@@ -53,6 +53,7 @@ void MessageReader::doWork(client *cl)
 {
     while(m_isRunning) {
         std::string result;
+
         int z = cl->readMessage(result);
         if(z == 0) {
             m_isRunning = false;

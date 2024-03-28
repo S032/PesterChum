@@ -9,7 +9,8 @@ client::client(QWidget *parent)
     :
     servPort(34543),
     servIp("192.168.1.103")
-    //84.201.157.25:26098 - real server
+    //84.201.157.25:26098 - vpn server
+    //81.94.156.108:34543 - vds server
     //192.168.1.103:34543 - local server
 {
     buffer.reserve(MAXLINE);
@@ -39,37 +40,87 @@ client::Close() {
 }
 
 bool client::writeMessage(std::string message) {
-    if(send(clientSock, message.c_str(), message.size(), 0) < 0)
-        return false;
+    uint32_t messageLength = htonl(message.size());
+    int needToSend = sizeof(uint32_t);
+    int sendedLength;
+
+    //sending a usefull information size
+    while(needToSend > 0) {
+        if((sendedLength = send(clientSock, reinterpret_cast<char*>(&messageLength), needToSend, 0)) <= 0) {
+            return false;
+        }
+        needToSend -= sendedLength;
+    }
+
+    //sending a message
+    messageLength = ntohl(messageLength);
+    qDebug() << "sending message...";
+    qDebug() << "messageLength: " << messageLength;
+    while(messageLength > 0) {
+        if((sendedLength = send(clientSock, message.c_str(), messageLength, 0)) <= 0) {
+            return false;
+        }
+        messageLength -= sendedLength;
+    }
+    qDebug() << "sendtoserver: " << message;
     return true;
 }
 
 int client::readMessage(std::string &message) {
-    std::vector<char> buff(MAXLINE);
-    memset(buff.data(), 0, buff.size());
-    int res = recv(clientSock, buff.data(), buff.size(), 0);
-    message = buff.data();
-    return res;
+    uint32_t messageLength;
+    int needToRead = sizeof(uint32_t);
+    int readLength;
+    char *readedMessage = nullptr;
+    int totalReadLength = 0;
+
+    //reading a useful infromation size
+    while(needToRead > 0) {
+        if ((readLength = recv(clientSock, reinterpret_cast<char*>(&messageLength), needToRead, 0)) <= 0) {
+            delete[] readedMessage;
+            emit throwFatalError("server prematurely terminated!");
+            return readLength;
+        }
+        needToRead -= readLength;
+    }
+    messageLength = ntohl(messageLength);
+    qDebug() << "messagelength: " << messageLength;
+    readedMessage = new char[messageLength + 1];
+    memset(readedMessage, 0, messageLength + 1);
+    //reading a message
+    while(messageLength > 0) {
+        if ((readLength = recv(clientSock, readedMessage + totalReadLength, messageLength, 0)) <= 0) {
+            delete[] readedMessage;
+            emit throwFatalError("server prematurely terminated!");
+            return readLength;
+        }
+        messageLength -= readLength;
+        totalReadLength += readLength;
+    }
+
+    readedMessage[totalReadLength] = '\0';
+    message = readedMessage;
+    delete[] readedMessage;
+    return totalReadLength;
 }
 
 int client::reg_user(std::string username, std::string password) {
     std::string querry = "/reg/" + username + "/" + password;
-    if (send(clientSock, querry.c_str(), querry.size(), 0) < 0)
+    if (!writeMessage(querry))
         return -1;
-    std::vector<char> buff(MAXLINE);
-    recv(clientSock, buff.data(), buff.size(), 0);
-    std::string answer(buff.data());
+    std::string answer;
+    readMessage(answer);
     if (answer == "/s") return 0;
     return -2;
 }
 
 int client::log_user(std::string username, std::string password) {
     std::string querry = "/log/" + username + "/" + password;
-    if (send(clientSock, querry.c_str(), querry.size(), 0) < 0)
+    if (!writeMessage(querry))
         return -1;
-    std::vector<char> buff(MAXLINE);
-    recv(clientSock, buff.data(), buff.size(), 0);
-    std::string answer(buff.data());
+    std::string answer;
+    readMessage(answer);
+    qDebug() << answer;
+    if (answer == "/status/smile") return 0;
     if (answer == "/status/angry") return 1;
-    return 0;
+    return -2;
 }

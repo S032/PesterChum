@@ -26,8 +26,6 @@ private:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 
-
-
 class UserchatsDelegate : public QStyledItemDelegate
 {
 private:

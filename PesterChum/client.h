@@ -36,7 +36,7 @@ public:
     int Connect();
     void Close();
     bool writeMessage(std::string);
-    int readMessage(std::string &);
+    int readMessage(std::string &message);
 signals:
     void throwFatalError(QString errortext);
     void throwError(QString errortext);

@@ -44,10 +44,16 @@ void MainWindow::setup_images()
 {
     friends_pic = new QPixmap("://images/friends_41x41.png");
     friends_pic_alert = new QPixmap("://images/friends_alert_41x41.png");
+    notifications_pic = new QPixmap("://images/notifications_41x41.png");
+    notifications_pic_alert = new QPixmap("://images/notifications_alert_41x41.png");
 
     QIcon ButtonIcon(*(friends_pic));
     ui->friends_button->setIcon(ButtonIcon);
     ui->friends_button->setIconSize(friends_pic->rect().size());
+
+    QIcon ButtonIcon2(*(notifications_pic));
+    //ui->notificationsButton->setIcon(ButtonIcon2);
+    //ui->notificationsButton->setIconSize(notifications_pic->rect().size());
     //Mood button
     smile_pic = new QPixmap("://images/smile_43x43.png");
     inactive_pic = new QPixmap("://images/inactive_43x43.png");
@@ -185,7 +191,6 @@ void MainWindow::deleteFriend(const QPoint& pos, const QModelIndex index)
         std::string friend_name = index.data().toString().toStdString();
         std::string query = "/delfriend/" + friend_name;
         cl->writeMessage(query);
-        Sleep(100); // убрать
         sendQuery("getlist");
     }
 }
@@ -246,14 +251,12 @@ void MainWindow::getIcRequests()
         ui->friends_button->setIcon(ButtonIcon);
         ui->friends_button->setIconSize(friends_pic->rect().size());
     }
-    Sleep(100); // убрать слипание покетоввававава ужас так делать ваще!!!!
     sendQuery("getlist");
 }
 
 void MainWindow::getOgRequests()
 {
     sendQuery("getogreq");
-    Sleep(100); // убрать слипание покетоввававава ужас так делать ваще!!!!
     sendQuery("getlist");
 }
 
@@ -265,9 +268,7 @@ void MainWindow::start(QString S_user, client *auth_cl, QString lastStatus) {
     usercontroller = new UserchatsController();
     startReadInThread();
     sendQuery("getlist");
-    Sleep(100); //боже за что...
     sendQuery("geticreq");
-    Sleep(100); //убрать
     sendQuery("getogreq");
     setup_listview();
     setup_images();

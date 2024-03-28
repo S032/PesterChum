@@ -311,7 +311,7 @@
         <string notr="true">color: rgb(0, 0, 0);</string>
        </property>
        <property name="text">
-        <string>ДОСТАЛОГ:</string>
+        <string>ДИАЛОГ:</string>
        </property>
       </widget>
      </item>
@@ -418,7 +418,7 @@ border: 5px solid rgba(197, 139, 3, 1);
 }</string>
        </property>
        <property name="text">
-        <string>ДОСТАТЬ!</string>
+        <string>ОТПРАВИТЬ!</string>
        </property>
       </widget>
      </item>

@@ -54,6 +54,8 @@ private:
     QString                fontFamily;
     QPixmap                *friends_pic;
     QPixmap                *friends_pic_alert;
+    QPixmap                *notifications_pic;
+    QPixmap                *notifications_pic_alert;
     QPixmap                *smile_pic;
     QPixmap                *inactive_pic;
     QPixmap                *angry_pic;

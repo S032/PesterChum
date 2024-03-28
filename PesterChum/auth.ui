@@ -45,7 +45,7 @@
       <string notr="true"/>
      </property>
      <property name="text">
-      <string>АУТЕНТИФИКАЦИЯ)</string>
+      <string>АВТОРИЗАЦИЯ)</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -70,7 +70,7 @@
 </string>
          </property>
          <property name="text">
-          <string>КОРЕШНИК:</string>
+          <string>НИКНЕЙМ:</string>
          </property>
         </widget>
        </item>
@@ -102,10 +102,16 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>60</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>55</height>
+           <height>60</height>
           </size>
          </property>
          <property name="font">
@@ -129,10 +135,16 @@ border: 5px solid rgba(197, 139, 3, 1);</string>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>60</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>55</height>
+           <height>60</height>
           </size>
          </property>
          <property name="font">
@@ -215,7 +227,7 @@ border: 5px solid rgba(197, 139, 3, 1);
 </string>
        </property>
        <property name="text">
-        <string>ЗАРЕГИТЬСЯ</string>
+        <string>ЗАРЕГИСТРИРОВАТЬСЯ</string>
        </property>
       </widget>
      </item>
