@@ -1,5 +1,6 @@
 QT       += core gui
 QT       += core
+QT       += core gui widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -19,7 +20,8 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     messagethread.cpp \
-    userchat.cpp
+    userchat.cpp \
+    windowssystemhandler.cpp
 
 HEADERS += \
     auth.h \
@@ -29,7 +31,8 @@ HEADERS += \
     itemdelegate.h \
     mainwindow.h \
     messagethread.h \
-    userchat.h
+    userchat.h \
+    windowssystemhandler.h
 
 FORMS += \
     auth.ui \

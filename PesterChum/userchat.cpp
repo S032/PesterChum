@@ -1,19 +1,19 @@
 #include "userchat.h"
 #include "ui_userchat.h"
 
-UserChat::UserChat(QWidget *parent, std::string r_name, std::string s_name, client *auth_cl, QString m_fontFamily)
+UserChat::UserChat(QWidget *parent, chatPacket_t chatinfo, windowsSystemHandler *m_winHandler)
     : QDialog(parent)
     , ui(new Ui::UserChat)
+    , winHandler(m_winHandler)
+    , cl(chatinfo.cl)
+    , username(chatinfo.sender_name)
+    , fontFamily(chatinfo.fontFamily)
 {
     ui->setupUi(this);
-    //setWindowFlags(windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
-    cl = auth_cl;
-    fontFamily = m_fontFamily;
     model = new MessageModel(this, ui);
-    recipient_name = "::  " + r_name + "  ::";
+    recipient_name = "::  " + chatinfo.recipient_name + "  ::";
     ui->label_2->setText(recipient_name.c_str());
-    recipient_name = r_name;
-    username = s_name;
+    recipient_name = chatinfo.recipient_name;
     setup_font();
     setup_listview();
 }
@@ -54,16 +54,36 @@ void UserChat::writeSenderMessage(std::string message)
     model->addMessage(message.c_str(), Qt::red);
 }
 
-void UserChat::writeLeftMessage()
+void UserChat::pre_initBuffAppend(std::string message)
 {
-    std::string message = recipient_name + " вышел в ofline";
-    model->addMessage(message.c_str(), Qt::gray);
+    pre_initBuffer.push_back(message);
 }
-// пофиксить кри нж
-void UserChat::writeJoinMessage()
+
+void UserChat::pre_initBuffLoadout()
 {
-    std::string message = recipient_name + " снова online";
-    model->addMessage(message.c_str(), Qt::gray);
+    if (!pre_initBuffer.empty()) {
+        for (std::string message : pre_initBuffer) {
+            model->addMessage(message.c_str(), Qt::red);
+        }
+        pre_initBuffer.clear();
+    }
+}
+
+bool UserChat::wasItOpened()
+{
+    return wasOpened;
+}
+
+void UserChat::setItOpened()
+{
+    wasOpened = true;
+}
+
+void UserChat::writeSystemMessage(QString message)
+{
+    std::string recp_name = recipient_name + " ";
+    message = recp_name.c_str() + message + " " + winHandler->getTime();
+    model->addMessage(message, Qt::gray);
 }
 
 void UserChat::throw_message() {
@@ -86,33 +106,48 @@ void UserChat::on_lineEdit_returnPressed() {
     throw_message();
 }
 ///////////////////////////////////////////////////////
+UserchatsController::UserchatsController(QWidget *m_parent, windowsSystemHandler *m_winHandler)
+    :
+    parent(m_parent),
+    winHandler(m_winHandler)
+{}
+
 bool UserchatsController::chatIsOpen(std::string login)
 {
     return !userchats[login]->isHidden();
 }
 
-void UserchatsController::addChat(std::string login, UserChat *chat)
+void UserchatsController::addChat(chatPacket_t chatinfo)
 {
-    userchats.insert({login, chat});
+    UserChat *chat = new UserChat(parent, chatinfo);
+    userchats.insert({chatinfo.recipient_name, chat});
 }
 
 void UserchatsController::openChat(std::string login)
 {
     userchats[login]->show();
-    userchats[login]->update();
+    userchats[login]->pre_initBuffLoadout();
+    userchats[login]->setItOpened();
 }
 
 void UserchatsController::sendMessageToChat(std::string login, std::string message)
 {
-    userchats[login]->writeSenderMessage(message);
+    if (userchats[login]->isHidden() && !userchats[login]->wasItOpened()) {
+        if (parent->isMinimized()) emit throwNotification(NEW_MSG, message);
+        userchats[login]->pre_initBuffAppend(message);
+    }
+    else {
+        if (parent->isMinimized()) emit throwNotification(NEW_MSG, message);
+        userchats[login]->writeSenderMessage(message);
+    }
 }
 
 void UserchatsController::sendLeftMessage(std::string login)
 {
-    userchats[login]->writeLeftMessage();
+    userchats[login]->writeSystemMessage("вышел в offline в");
 }
 
 void UserchatsController::sendJoinMessage(std::string login)
 {
-    userchats[login]->writeJoinMessage();
+    userchats[login]->writeSystemMessage("снова online с");
 }

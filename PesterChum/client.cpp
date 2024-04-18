@@ -8,7 +8,7 @@ void client::giveNewParent(QMainWindow *NewParent)
 client::client(QWidget *parent)
     :
     servPort(34543),
-    servIp("192.168.1.103")
+    servIp("81.94.156.108")
     //84.201.157.25:26098 - vpn server
     //81.94.156.108:34543 - vds server
     //192.168.1.103:34543 - local server

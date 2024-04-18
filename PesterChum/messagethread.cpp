@@ -30,10 +30,10 @@ void ThreadController::requestAnswerHandler(std::string answer)
     qDebug() << "rec_name: " << recipient_name;
     qDebug() << "answ: " << answ;
     if (answ == "accept") {
-
+        emit throwNotification(REQ_ACC, recipient_name + " принял ваш запрос в друзья");
     }
-    else if (answ == "denie") {
-
+    else if (answ == "denied") {
+        emit throwNotification(REQ_DEN, recipient_name + " отклонил ваш запрос в друзья");
     }
     else if (answ == "exist") {
         emit throwError("запрос уже существует!");
@@ -105,7 +105,9 @@ void ThreadController::answerHandler(std::string answer)
         requestAnswerHandler(answer);
     }
     else if (cmd == "delfriend") {
-        std::string notfriend_name; // добавить уведомление об удалении из др
+        l_pos = r_pos + 1;
+        std::string notfriend_name = {answer.begin() + l_pos, answer.end()};; // добавить уведомление об удалении из др
+        emit throwNotification(FRD_DEL, notfriend_name + " удалил вас из своего списка друзей");
         emit getUsers();
     }
     else if (cmd == "left") {

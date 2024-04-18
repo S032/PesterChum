@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <string>
 #include "client.h"
+#include "windowssystemhandler.h"
 #include "customItemModel.h"
 
 class MessageReader : public QObject
@@ -53,6 +54,7 @@ signals:
     void startRead(client *cl);
     void throwFatalError(QString errortext);
     void throwError(QString errortext);
+    void throwNotification(std::string notifyType, std::string text);
 };
 
 #endif // MESSAGETHREAD_H

@@ -1,6 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+void MainWindow::setup_icon()
+{
+    QIcon icon(":/images/PesterChums.png");
+    QApplication::setWindowIcon(icon);
+}
+
 void MainWindow::setup_listview()
 {
     ui->UserList->setModel(usermodel);
@@ -51,9 +57,6 @@ void MainWindow::setup_images()
     ui->friends_button->setIcon(ButtonIcon);
     ui->friends_button->setIconSize(friends_pic->rect().size());
 
-    QIcon ButtonIcon2(*(notifications_pic));
-    //ui->notificationsButton->setIcon(ButtonIcon2);
-    //ui->notificationsButton->setIconSize(notifications_pic->rect().size());
     //Mood button
     smile_pic = new QPixmap("://images/smile_43x43.png");
     inactive_pic = new QPixmap("://images/inactive_43x43.png");
@@ -106,8 +109,9 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    //setWindowFlags(windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
     ui->setupUi(this);
+    winHandler = new windowsSystemHandler((QWidget*)this);
+    QObject::connect(winHandler, &windowsSystemHandler::openWindow, this, &MainWindow::show);
     setup_font();
     cl = new client(this);
     friendReq = new friendrequset(this, fontFamily);
@@ -160,6 +164,7 @@ void MainWindow::startReadInThread()
     QObject::connect(ReadThread, &ThreadController::gotNewMessage, this, &MainWindow::gotNewMessage);
     QObject::connect(ReadThread, &ThreadController::sendLeaveMessage, this, &MainWindow::friendLeft);
     QObject::connect(ReadThread, &ThreadController::sendJoinMessage, this, &MainWindow::friendJoin);
+    QObject::connect(ReadThread, &ThreadController::throwNotification, this, &MainWindow::throwNotification);
     ReadThread->emit startRead(cl);
 }
 
@@ -176,6 +181,11 @@ void MainWindow::changeStatus(const QString &status)
         QString userlabel = "<img src=':/images/angry_28x23.png' style='vertical-align: middle;'> " + username;
         ui->UserName->setText(userlabel);
     }
+}
+
+void MainWindow::throwNotification(std::string notifyType, std::string text)
+{
+    winHandler->throwNotification(notifyType, text);
 }
 
 void MainWindow::deleteFriend(const QPoint& pos, const QModelIndex index)
@@ -265,15 +275,15 @@ void MainWindow::start(QString S_user, client *auth_cl, QString lastStatus) {
     auth_cl->giveNewParent(this);
     username = S_user;
     usermodel = new UserchatModel(this);
-    usercontroller = new UserchatsController();
+    usercontroller = new UserchatsController(this, winHandler);
+    QObject::connect(usercontroller, &UserchatsController::throwNotification, this, &MainWindow::throwNotification);
     startReadInThread();
     sendQuery("getlist");
     sendQuery("geticreq");
     sendQuery("getogreq");
     setup_listview();
     setup_images();
-    QString userlabel = "<img src=':/images/"+lastStatus+"_28x23.png' style='vertical-align: middle;'> " + username;
-    ui->UserName->setText(userlabel);
+    ui->UserName->setText("<img src=':/images/"+lastStatus+"_28x23.png' style='vertical-align: middle;'> " + username);
     setup_buttons_mapper();
     this->show();
 }
@@ -302,8 +312,8 @@ void MainWindow::updateListOfUsers(std::string userlist)
         status = {userlist.begin() + l_pos, userlist.begin() + r_pos};
         // doing stuff
         usermodel->addUserchat(recipient_name.c_str(), status.c_str());
-        UserChat *chat = new UserChat(this, recipient_name, username.toStdString(), cl, fontFamily);
-        usercontroller->addChat(recipient_name, chat);
+        chatPacket_t chatinfo = {username.toStdString(), recipient_name, cl, fontFamily};
+        usercontroller->addChat(chatinfo);
         // next step
         l_pos = r_pos + 1;
         r_pos = userlist.find("/", l_pos);

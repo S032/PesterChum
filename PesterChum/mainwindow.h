@@ -18,7 +18,7 @@
 #include <QSignalMapper>
 #include <QThread>
 #include <QDebug>
-#include <windows.h>
+#include "windowssystemhandler.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -34,6 +34,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 private:
+    void setup_icon();
     void setup_listview();
     void setup_font();
     void setup_images();
@@ -50,16 +51,17 @@ private:
     Auth                   *reg;
     friendrequset          *friendReq;
     client                 *cl;
+    windowsSystemHandler   *winHandler;
     QString                username;
     QString                fontFamily;
-    QPixmap                *friends_pic;
+    QPixmap                *friends_pic; // сделать массив или типа того чо за параша много... /////////////////
     QPixmap                *friends_pic_alert;
     QPixmap                *notifications_pic;
     QPixmap                *notifications_pic_alert;
     QPixmap                *smile_pic;
     QPixmap                *inactive_pic;
     QPixmap                *angry_pic;
-    QPixmap                *PesterChums;
+    QPixmap                *PesterChums; //////////////////////////////////////////////////////////////////////
     QSignalMapper          *signalMapper;
 public slots:
     void proccesFatalError(QString error);
@@ -78,6 +80,7 @@ public slots:
     void friendLeft(std::string name);
     void friendJoin(std::string name);
     void changeStatus(const QString &status);
+    void throwNotification(std::string notifyType, std::string text);
 signals:
     void startChat(std::string S_user, client *cl, QString fontFamily);
 private slots:

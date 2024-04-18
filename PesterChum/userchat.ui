@@ -228,7 +228,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>КорешЧат</string>
+   <string>Чат</string>
   </property>
   <property name="styleSheet">
    <string notr="true">    background-color: rgba(255, 181, 0, 1);
