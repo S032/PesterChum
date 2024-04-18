@@ -45,7 +45,7 @@ bool ChatDatabase::check_username(user_t *user) {
     try
     {
         stmt = conn->createStatement();
-        rs = stmt->executeQuery("SELECT UserName From User WHERE UserName ='" +user->login+"'");
+        rs = stmt->executeQuery("SELECT UserName From User WHERE BINARY UserName ='" +user->login+"'");
         if(!rs->next())
             return false;
         return true;
@@ -62,7 +62,7 @@ int ChatDatabase::UsernameToInt(std::string username) {
     try
     {
         sql::SQLString query = "SELECT ID FROM User";
-        query += " WHERE UserName = '"+username+"'";
+        query += " WHERE BINARY UserName = '"+username+"'";
         stmt = conn->createStatement();
         rs= stmt->executeQuery(query);
         if(!rs->next()) return -1;
@@ -100,7 +100,7 @@ bool ChatDatabase::check_user_in_chattable(std::string sender_name, std::string 
         sql::SQLString query = "SELECT US2.UserName FROM Chats AS CH";
         query += " INNER JOIN User AS US1 ON CH.User1 = US1.ID";
         query += " INNER JOIN User AS US2 ON CH.User2 = US2.ID";
-        query += " WHERE US1.UserName = '"+sender_name+"'";
+        query += " WHERE BINARY US1.UserName = '"+sender_name+"'";
         query += " AND US2.UserName = '"+recipient_name+"'";
         stmt = conn->createStatement();
         rs= stmt->executeQuery(query);
@@ -122,7 +122,7 @@ std::vector<std::string> ChatDatabase::getFriendList(std::string username) {
         sql::SQLString query = "SELECT US2.UserName FROM Chats AS CH";
         query += " INNER JOIN User AS US1 ON CH.User1 = US1.ID";
         query += " INNER JOIN User AS US2 ON CH.User2 = US2.ID";
-        query += " WHERE US1.UserName = '"+username+"'";
+        query += " WHERE BINARY US1.UserName = '"+username+"'";
         stmt = conn->createStatement();
         rs= stmt->executeQuery(query);
         while(rs->next()) {
@@ -163,7 +163,7 @@ bool ChatDatabase::log_user(user_t *user) {
     {
         sql::SQLString query = "SELECT U.UserName, U.Password, S.Status FROM User AS U";
         query += " INNER JOIN Status AS S ON U.Status = S.ID";
-        query += " WHERE U.UserName = '"+user->login+"' AND U.Password = '"+user->password+"'";
+        query += " WHERE BINARY U.UserName = '"+user->login+"' AND U.Password = '"+user->password+"'";
         stmt = conn->createStatement();
         rs = stmt->executeQuery(query);
         if(!rs->next())
@@ -186,7 +186,7 @@ bool ChatDatabase::getListOfIcReq(std::string *answer, std::string username) {
         sql::SQLString query = "SELECT US1.UserName FROM Request AS Req";
         query += " INNER JOIN User AS US1 ON Req.User1 = US1.ID";
         query += " INNER JOIN User AS US2 ON Req.User2 = US2.ID";
-        query += " WHERE US2.UserName = '"+username+"'";
+        query += " WHERE BINARY US2.UserName = '"+username+"'";
         stmt = conn->createStatement();
         rs = stmt->executeQuery(query);
         while(rs->next()) {
@@ -209,7 +209,7 @@ bool ChatDatabase::getListOfOgReq(std::string *answer, std::string username) {
         sql::SQLString query = "SELECT US2.UserName FROM Request AS Req";
         query += " INNER JOIN User AS US1 ON Req.User1 = US1.ID";
         query += " INNER JOIN User AS US2 ON Req.User2 = US2.ID";
-        query += " WHERE US1.UserName = '"+username+"'";
+        query += " WHERE BINARY US1.UserName = '"+username+"'";
         stmt = conn->createStatement();
         rs = stmt->executeQuery(query);
         while(rs->next()) {
@@ -236,13 +236,15 @@ bool ChatDatabase::addRequest(std::string sender_name, std::string recipient_nam
         }
         //check if recipient is already friend
         sql::SQLString query = "SELECT * FROM Chats";
-        query += " WHERE User1 = '"+sender_id+"' AND User2 = "+recipient_id;
+        query += " WHERE BINARY User1 = '"+sender_id+"' AND User2 = "+recipient_id;
         stmt = conn->createStatement();
         rs = stmt->executeQuery(query);
         if (rs->next()) {
             *(answer) = "/reqanswer/" + recipient_name + "/already";
             return false;
         }
+        //check if recipient has already sent req and make them friends :3
+        
         //adding request
         query = "INSERT INTO Request VALUES("+sender_id+", "+recipient_id+")";
         stmt = conn->createStatement();
@@ -272,7 +274,7 @@ bool ChatDatabase::delRequest(std::string requester_name, std::string recipient_
             return false;
         }
 
-        sql::SQLString query = "DELETE FROM Request WHERE User1 = '"+requester_id+"' AND User2 = '"+recipient_id+"'";
+        sql::SQLString query = "DELETE FROM Request WHERE BINARY User1 = '"+requester_id+"' AND User2 = '"+recipient_id+"'";
         stmt = conn->createStatement();
         stmt->execute(query);
         *(answer) = "/s";
@@ -295,9 +297,11 @@ bool ChatDatabase::makeChat(std::string user1, std::string user2) {
         sql::SQLString query = "INSERT INTO Chats VALUES("+user1_id+", "+user2_id+")";
         stmt = conn->createStatement();
         stmt->execute(query);
-        query = "INSERT INTO Chats VALUES("+user2_id+", "+user1_id+")";
-        stmt = conn->createStatement();
-        stmt->execute(query);
+        if (user1_id != user2_id) {
+            query = "INSERT INTO Chats VALUES("+user2_id+", "+user1_id+")";
+            stmt = conn->createStatement();
+            stmt->execute(query);
+        }
         return true;
     }
     catch(sql::SQLException &e)
@@ -314,10 +318,10 @@ bool ChatDatabase::delChat(std::string sender_name, std::string friend_name) {
         std::string sender_id = std::to_string(UsernameToInt(sender_name));
         std::string friend_id = std::to_string(UsernameToInt(friend_name));
         if (friend_id == "-1") return false;
-        sql::SQLString query = "DELETE FROM Chats WHERE User1 = "+sender_id+" AND User2 = "+friend_id;
+        sql::SQLString query = "DELETE FROM Chats WHERE BINARY User1 = "+sender_id+" AND User2 = "+friend_id;
         stmt = conn->createStatement();
         stmt->execute(query);
-        query = "DELETE FROM Chats WHERE User2 = "+sender_id+" AND User1 = "+friend_id;
+        query = "DELETE FROM Chats WHERE BINARY User2 = "+sender_id+" AND User1 = "+friend_id;
         stmt = conn->createStatement();
         stmt->execute(query);
         return true;
@@ -337,7 +341,7 @@ bool ChatDatabase::writeLastStatus(std::string username, std::string status) {
         if (status_id == "-1") return false;
         sql::SQLString query = "UPDATE User";
         query += " SET Status = "+status_id;
-        query += " WHERE UserName = '"+username+"'";
+        query += " WHERE BINARY UserName = '"+username+"'";
         stmt = conn->createStatement();
         stmt->execute(query);
         return true;

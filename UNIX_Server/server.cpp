@@ -294,24 +294,15 @@ bool server::ReadMessage(int sockfd, void *buff) {
         needToRead -= readLength;
     }
     messageLength = ntohl(messageLength);
-    //readedMessage = new char[messageLength + 1];
     memset(buff, 0, messageLength);
-    std::cout << "reading a message...\n";
-    std::cout << "messageLength: " << messageLength << std::endl;
-
 
     //reading a message
     while(messageLength > 0) {
-        if ((readLength = recv(sockfd, static_cast<char*>(buff) + totalLength, messageLength, 0)) <= 0) {
-            //delete[] readedMessage;
+        if ((readLength = recv(sockfd, static_cast<char*>(buff) + totalLength, messageLength, 0)) <= 0)
             return false;
-        }
         messageLength -= readLength;
         totalLength += readLength;
     }
-    //readedMessage[totalLength] = '\0';
-    //buff = static_cast<void*>(readedMessage);
-    //delete[] readedMessage;
     return true;
 }
 
@@ -328,8 +319,6 @@ bool server::SendMessage(int sockfd, std::string message, std::string recipient_
     }
     //sending a message
     messageLength = ntohl(messageLength);
-    std::cout << "sending a message...\n";
-    std::cout << "messageLength: " << messageLength << std::endl; 
     while(messageLength > 0) {
         if ((sendedLength = send(sockfd, message.c_str(), message.size(), 0)) <= 0)
             return false;
