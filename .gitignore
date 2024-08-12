@@ -72,3 +72,8 @@ CMakeLists.txt.user*
 *.dll
 *.exe
 
+UNIX_Server/PesterServer
+UNIX_Server/debug/
+UNIX_Server/build/
+
+
