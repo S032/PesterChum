@@ -1,4 +1,5 @@
 #include "ChatDatabase.h"
+#include <cstdlib>
 
 void ChatDatabase::print_err(sql::SQLException e) {
     std::cerr << "# ERR: SQLException in " << __FILE__;
@@ -8,19 +9,33 @@ void ChatDatabase::print_err(sql::SQLException e) {
 };
 
 ChatDatabase::ChatDatabase() {
-    try
-    {
-        driver = sql::mysql::get_mysql_driver_instance();
-        printf("DB: Connecting DataBase...\n");
-        conn = driver->connect(db_uri, db_user, db_pass);
-        conn->setSchema(db);
-        printf("DB: Success\n");
+  mysqlServerConnect(15, 5000);
+}
+
+void ChatDatabase::mysqlServerConnect(int timeoutSeconds, int retryIntervalMs){
+    auto start_time = std::chrono::steady_clock::now();
+    auto end_time = start_time + std::chrono::seconds(timeoutSeconds);
+
+    driver = sql::mysql::get_mysql_driver_instance();
+
+    while (std::chrono::steady_clock::now() < end_time) {
+        try {
+            conn.reset(driver->connect(db_uri, db_user, db_pass));
+            if (conn && conn->isValid()) {
+                conn->setSchema(db);
+                std::cout << "Connected to MySQL successfully." << std::endl;
+                return;
+            }
+        } catch (sql::SQLException &e) {
+            std::cerr << "Connection failed: " << e.what() << std::endl;
+            std::cerr << "Retrying in " << retryIntervalMs << "ms..." << std::endl;
+        }
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(retryIntervalMs));
     }
-    catch(sql::SQLException& e)
-    {
-    print_err(e);
-    return;
-    }
+
+    std::cerr << "Failed to connect within the timeout period." << std::endl;
+    exit(EXIT_FAILURE);
 }
 
 int ChatDatabase::find_next_id(sql::SQLString Table) {

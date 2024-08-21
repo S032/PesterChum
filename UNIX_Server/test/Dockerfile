@@ -1,14 +1,9 @@
-FROM ubuntu:24.10
+FROM mysql
 
-RUN apt-get update && \
-    apt-get install -y \
-    cmake \
-    build-essential \
-    libmysqlclient-dev \
-    git \
-    libmysqlclient-dev && \
-    apt-get clean
+ENV   MYSQL_ROOT_PASSWORD=root_password
+ENV   MYSQL_DATABASE=PesterChum
+ENV   MYSQL_USER=chat_admin
+ENV   MYSQL_PASSWORD=5639
 
-RUN git clone https://github.com/S032/PesterChum.git
-
-CMD ["PesterChum/UNIX_Server/./server"]
+EXPOSE 3306:3306
+VOLUME ["/var/lib/mysql"]
